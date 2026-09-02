@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daily Dashboard — Nico</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-deep: #060810;
+    --bg-navy: #0a0e1a;
+    --surface: #0d1526;
+    --surface2: #111d35;
+    --border: rgba(64,120,220,0.18);
+    --border-glow: rgba(64,170,255,0.35);
+    --accent: #40aaff;
+    --accent2: #7b4fff;
+    --accent3: #00e5ff;
+    --green: #00e676;
+    --yellow: #ffd740;
+    --red: #ff5252;
+    --orange: #ff9100;
+    --blue: #40c4ff;
+    --text: #e0eeff;
+    --muted: #5a7fa8;
+    --subtle: #8ab4d4;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg-deep);
+    color: var(--text);
+    font-family: 'Inter', system-ui, sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    background-image:
+      radial-gradient(ellipse 80% 60% at 10% 20%, rgba(123,79,255,0.07) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 50% at 90% 10%, rgba(0,180,255,0.06) 0%, transparent 55%),
+      radial-gradient(ellipse 50% 40% at 50% 80%, rgba(64,170,255,0.04) 0%, transparent 50%);
+  }
+
+  /* STARFIELD */
+  #starfield { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+  .star {
+    position: absolute; border-radius: 50%; background: #fff;
+    animation: twinkle var(--dur, 4s) ease-in-out infinite var(--delay, 0s);
+  }
+  @keyframes twinkle {
+    0%, 100% { opacity: var(--min-op, 0.2); transform: scale(1); }
+    50% { opacity: var(--max-op, 0.9); transform: scale(1.4); }
+  }
+
+  /* NAV */
+  .nav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(6,8,16,0.85); backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+  }
+  .nav-inner {
+    max-width: 1300px; margin: 0 auto;
+    display: flex; align-items: center; gap: 8px;
+    height: 52px;
+  }
+  .nav-brand {
+    font-family: 'Orbitron', monospace; font-size: 0.65rem;
+    letter-spacing: 4px; color: var(--accent); opacity: 0.7;
+    margin-right: auto;
+  }
+  .nav-link {
+    color: var(--subtle); text-decoration: none; font-size: 0.82rem;
+    font-weight: 500; padding: 6px 14px; border-radius: 6px;
+    transition: all 0.2s; border: 1px solid transparent;
+  }
+  .nav-link:hover { color: var(--text); background: var(--surface2); border-color: var(--border); }
+  .nav-link.active {
+    color: var(--accent); background: rgba(64,170,255,0.08);
+    border-color: rgba(64,170,255,0.25);
+  }
+  .nav-sep { color: var(--muted); font-size: 0.75rem; }
+
+  /* LAYOUT */
+  .page { position: relative; z-index: 1; max-width: 1300px; margin: 0 auto; padding: 0 20px 80px; }
+
+  /* HERO */
+  .hero-header { text-align: center; padding: 56px 20px 44px; position: relative; }
+  .hero-header::after {
+    content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+    width: 60%; height: 1px; background: linear-gradient(90deg, transparent, var(--border-glow), transparent);
+  }
+  .hero-eyebrow { font-family: 'Orbitron', monospace; font-size: 0.65rem; letter-spacing: 6px; text-transform: uppercase; color: var(--accent); margin-bottom: 16px; opacity: 0.8; }
+  .hero-title {
+    font-family: 'Orbitron', monospace; font-size: clamp(2rem, 6vw, 4rem);
+    font-weight: 900; letter-spacing: -1px; line-height: 1;
+    background: linear-gradient(135deg, #fff 0%, var(--accent3) 40%, var(--accent2) 80%, var(--accent) 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    filter: drop-shadow(0 0 40px rgba(64,170,255,0.3)); margin-bottom: 10px;
+  }
+  .hero-date { font-size: 0.88rem; color: var(--muted); letter-spacing: 1px; margin-top: 8px; }
+
+  /* SECTION */
+  .section { margin-top: 48px; }
+  .section-title {
+    font-family: 'Orbitron', monospace; font-size: 0.7rem;
+    letter-spacing: 5px; text-transform: uppercase;
+    color: var(--accent); opacity: 0.75; margin-bottom: 20px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .section-title::after {
+    content: ''; flex: 1; height: 1px;
+    background: linear-gradient(90deg, var(--border-glow), transparent);
+  }
+
+  /* CARD BASE */
+  .card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 14px; padding: 20px 22px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .card:hover { border-color: var(--border-glow); box-shadow: 0 4px 32px rgba(64,170,255,0.08); }
+
+  /* WEATHER */
+  .weather-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+  }
+  @media (max-width: 700px) {
+    .weather-grid { grid-template-columns: 1fr; }
+  }
+  .weather-main { grid-column: 1; }
+  .weather-card { display: flex; flex-direction: column; gap: 8px; }
+  .weather-loc { font-size: 0.75rem; color: var(--muted); font-weight: 500; letter-spacing: 0.5px; }
+  .weather-temp {
+    font-family: 'Orbitron', monospace; font-size: 2.6rem;
+    font-weight: 700; color: var(--text); line-height: 1;
+  }
+  .weather-temp.small { font-size: 1.8rem; }
+  .weather-cond { font-size: 0.9rem; color: var(--subtle); margin-top: 2px; }
+  .weather-wind { font-size: 0.78rem; color: var(--muted); }
+  .weather-trip-badge {
+    display: inline-block; font-size: 0.65rem; font-weight: 600;
+    letter-spacing: 1.5px; text-transform: uppercase;
+    background: rgba(64,170,255,0.12); color: var(--accent);
+    border: 1px solid rgba(64,170,255,0.25); border-radius: 4px;
+    padding: 2px 8px; margin-bottom: 6px;
+  }
+  .weather-loading { color: var(--muted); font-size: 0.85rem; }
+
+  /* EMAIL CARDS */
+  .email-list { display: flex; flex-direction: column; gap: 12px; }
+  .email-card {
+    display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;
+    cursor: pointer; text-decoration: none; color: inherit;
+  }
+  .email-card:hover .email-subject { color: var(--accent); }
+  .email-body { flex: 1; }
+  .email-subject { font-size: 0.9rem; font-weight: 600; color: var(--text); margin-bottom: 4px; transition: color 0.2s; }
+  .email-summary { font-size: 0.8rem; color: var(--muted); line-height: 1.4; }
+  .email-icon { font-size: 1rem; color: var(--muted); flex-shrink: 0; margin-top: 2px; opacity: 0.6; transition: opacity 0.2s; }
+  .email-card:hover .email-icon { opacity: 1; color: var(--accent); }
+
+  /* PROJECTS GRID */
+  .projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+  }
+  .proj-card { display: flex; flex-direction: column; gap: 10px; }
+  .proj-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+  .proj-name { font-size: 0.95rem; font-weight: 700; color: var(--text); }
+  .badge {
+    font-size: 0.6rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+    padding: 3px 8px; border-radius: 4px; white-space: nowrap;
+  }
+  .badge-live { background: rgba(0,230,118,0.12); color: var(--green); border: 1px solid rgba(0,230,118,0.3); }
+  .badge-active { background: rgba(64,170,255,0.12); color: var(--accent); border: 1px solid rgba(64,170,255,0.3); }
+  .badge-ongoing { background: rgba(123,79,255,0.12); color: var(--accent2); border: 1px solid rgba(123,79,255,0.3); }
+  .proj-desc { font-size: 0.8rem; color: var(--muted); line-height: 1.5; flex: 1; }
+  .proj-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 0.78rem; font-weight: 600; text-decoration: none;
+    color: var(--accent); background: rgba(64,170,255,0.08);
+    border: 1px solid rgba(64,170,255,0.25); border-radius: 7px;
+    padding: 7px 14px; transition: all 0.2s; align-self: flex-start;
+  }
+  .proj-btn:hover { background: rgba(64,170,255,0.18); border-color: rgba(64,170,255,0.5); }
+
+  /* THREADS */
+  .threads-list { display: flex; flex-direction: column; gap: 12px; }
+  .thread-card {
+    display: flex; align-items: flex-start; justify-content: space-between;
+    gap: 12px; text-decoration: none; color: inherit;
+  }
+  .thread-card:hover .thread-subject { color: var(--accent3); }
+  .thread-body { flex: 1; }
+  .thread-subject { font-size: 0.88rem; font-weight: 600; color: var(--text); margin-bottom: 3px; transition: color 0.2s; }
+  .thread-participants { font-size: 0.72rem; color: var(--accent); margin-bottom: 4px; }
+  .thread-summary { font-size: 0.78rem; color: var(--muted); line-height: 1.4; }
+  .thread-icon { font-size: 1rem; color: var(--muted); flex-shrink: 0; margin-top: 2px; opacity: 0.6; transition: opacity 0.2s; }
+  .thread-card:hover .thread-icon { opacity: 1; color: var(--accent3); }
+
+  /* FOOTER */
+  .footer {
+    text-align: center; margin-top: 64px; padding-top: 24px;
+    border-top: 1px solid var(--border);
+    font-size: 0.75rem; color: var(--muted);
+    position: relative; z-index: 1;
+  }
+  .footer span { display: block; margin-top: 4px; opacity: 0.5; }
+
+  @media (max-width: 600px) {
+    .hero-title { font-size: 1.8rem; }
+    .weather-temp { font-size: 2rem; }
+  }
+</style>
+</head>
+<body>
+
+<div id="starfield"></div>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-inner">
+    <div class="nav-brand">MISSION CONTROL</div>
+    <a href="daily.html" class="nav-link active">Daily Dashboard</a>
+    <span class="nav-sep">|</span>
+    <a href="index.html" class="nav-link">Starship Tracker</a>
+  </div>
+</nav>
+
+<div class="page">
+  <!-- HERO -->
+  <div class="hero-header">
+    <div class="hero-eyebrow">Personal HQ</div>
+    <div class="hero-title">Daily Dashboard</div>
+    <div class="hero-date" id="hero-date"></div>
+  </div>
+
+  <!-- WEATHER -->
+  <div class="section">
+    <div class="section-title">🌤️ Weather</div>
+    <div class="weather-grid">
+      <!-- Main: Outer Sunset SF -->
+      <div class="card weather-card weather-main">
+        <div class="weather-loc">📍 Outer Sunset, San Francisco, CA</div>
+        <div class="weather-temp" id="sf-temp"><span class="weather-loading">Loading…</span></div>
+        <div class="weather-cond" id="sf-cond"></div>
+        <div class="weather-wind" id="sf-wind"></div>
+      </div>
+      <!-- Trip: Whistler -->
+      <div class="card weather-card">
+        <div class="weather-trip-badge">✈️ Upcoming Trip</div>
+        <div class="weather-loc">🏔️ Whistler, BC &nbsp;·&nbsp; Sep 5, 2026</div>
+        <div class="weather-temp small" id="wh-temp"><span class="weather-loading">Loading…</span></div>
+        <div class="weather-cond" id="wh-cond"></div>
+        <div class="weather-wind" id="wh-wind"></div>
+      </div>
+      <!-- Trip: Moab -->
+      <div class="card weather-card">
+        <div class="weather-trip-badge">✈️ Upcoming Trip</div>
+        <div class="weather-loc">🏜️ Moab, Utah &nbsp;·&nbsp; Sep 23, 2026</div>
+        <div class="weather-temp small" id="mo-temp"><span class="weather-loading">Loading…</span></div>
+        <div class="weather-cond" id="mo-cond"></div>
+        <div class="weather-wind" id="mo-wind"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EMAIL HIGHLIGHTS -->
+  <div class="section">
+    <div class="section-title">📬 Email Highlights</div>
+    <div class="email-list">
+
+      <a class="card email-card" href="https://mail.google.com/mail/u/0/#search/from:f.inc+is:unread" target="_blank" rel="noopener">
+        <div class="email-body">
+          <div class="email-subject">Blueprint by Founders Inc</div>
+          <div class="email-summary">$150K investment program — deadline Sep 14. Worth a look for Zesty Labs.</div>
+        </div>
+        <div class="email-icon">↗</div>
+      </a>
+
+      <a class="card email-card" href="https://mail.google.com/mail/u/0/#search/from:mercury.com+is:unread" target="_blank" rel="noopener">
+        <div class="email-body">
+          <div class="email-subject">Mercury: Electric Air payment</div>
+          <div class="email-summary">$2,430 ACH received Sep 2 — confirm it cleared.</div>
+        </div>
+        <div class="email-icon">↗</div>
+      </a>
+
+      <a class="card email-card" href="https://mail.google.com/mail/u/0/#all/1a04a6786497ee31" target="_blank" rel="noopener">
+        <div class="email-body">
+          <div class="email-subject">Energy GPS — IOI from Sandalwood West</div>
+          <div class="email-summary">Indication of Interest doc shared — key deal milestone.</div>
+        </div>
+        <div class="email-icon">↗</div>
+      </a>
+
+      <a class="card email-card" href="https://mail.google.com/mail/u/0/#all/1a05e4b2aafc6ea5" target="_blank" rel="noopener">
+        <div class="email-body">
+          <div class="email-subject">Energy GPS — Supplemental Materials</div>
+          <div class="email-summary">Updated deal materials from Sandalwood West.</div>
+        </div>
+        <div class="email-icon">↗</div>
+      </a>
+
+      <a class="card email-card" href="https://mail.google.com/mail/u/0/#all/1a05ef10308b4174" target="_blank" rel="noopener">
+        <div class="email-body">
+          <div class="email-subject">Zesty Labs cash flow digest</div>
+          <div class="email-summary">August financial snapshot — review vs payroll/invoices.</div>
+        </div>
+        <div class="email-icon">↗</div>
+      </a>
+
+    </div>
+  </div>
+
+  <!-- ACTIVE PROJECTS -->
+  <div class="section">
+    <div class="section-title">🗂️ Active Projects</div>
+    <div class="projects-grid">
+
+      <div class="card proj-card">
+        <div class="proj-header">
+          <div class="proj-name">🚀 Starship Tracker</div>
+          <span class="badge badge-live">LIVE</span>
+        </div>
+        <div class="proj-desc">Tracks all SpaceX Starship IFT flights — upcoming launches, outcomes, and notes.</div>
+        <a class="proj-btn" href="index.html">Open Tracker →</a>
+      </div>
+
+      <div class="card proj-card">
+        <div class="proj-header">
+          <div class="proj-name">⚡ Energy GPS — Sandalwood West</div>
+          <span class="badge badge-active">ACTIVE DEAL</span>
+        </div>
+        <div class="proj-desc">IOI received from Sandalwood West. Riata Capital intro in progress. Deal materials shared.</div>
+        <a class="proj-btn" href="https://mail.google.com/mail/u/0/#search/sandalwood+OR+energy+gps" target="_blank" rel="noopener">View Emails →</a>
+      </div>
+
+      <div class="card proj-card">
+        <div class="proj-header">
+          <div class="proj-name">🧪 Zesty Labs</div>
+          <span class="badge badge-ongoing">ONGOING</span>
+        </div>
+        <div class="proj-desc">Invoices, cash flow, and outreach. Electric Air payment just landed. Blueprint $150K app closes Sep 14.</div>
+        <a class="proj-btn" href="https://mail.google.com/mail/u/0/#search/zesty+labs" target="_blank" rel="noopener">View Emails →</a>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- PROJECT THREADS -->
+  <div class="section">
+    <div class="section-title">💬 Project Threads</div>
+    <div class="threads-list">
+
+      <a class="card thread-card" href="https://mail.google.com/mail/u/0/#all/1a05ebb2c524b052" target="_blank" rel="noopener">
+        <div class="thread-body">
+          <div class="thread-subject">Re: Zesty Labs LLC sent you a new invoice</div>
+          <div class="thread-participants">Krista Mast (Electric Plant)</div>
+          <div class="thread-summary">Electric Plant confirmed payment — AR item closing.</div>
+        </div>
+        <div class="thread-icon">↗</div>
+      </a>
+
+      <a class="card thread-card" href="https://mail.google.com/mail/u/0/#all/1a016ac97a75a654" target="_blank" rel="noopener">
+        <div class="thread-body">
+          <div class="thread-subject">Meeting with Brandon Boyd – Riata Capital Group</div>
+          <div class="thread-participants">Maria at Sandalwood West</div>
+          <div class="thread-summary">Riata Capital intro — potential capital source for Energy GPS.</div>
+        </div>
+        <div class="thread-icon">↗</div>
+      </a>
+
+      <a class="card thread-card" href="https://mail.google.com/mail/u/0/#all/1a04a6786497ee31" target="_blank" rel="noopener">
+        <div class="thread-body">
+          <div class="thread-subject">SWW IOI - Energy GPS</div>
+          <div class="thread-participants">Sandalwood West LLC</div>
+          <div class="thread-summary">Formal IOI document — transaction milestone preceding offer.</div>
+        </div>
+        <div class="thread-icon">↗</div>
+      </a>
+
+    </div>
+  </div>
+
+</div><!-- /page -->
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div id="footer-ts">Last updated: —</div>
+  <span>Built with Boop 🤖</span>
+</footer>
+
+<script>
+// ── STARFIELD ──────────────────────────────────────────────
+(function() {
+  const sf = document.getElementById('starfield');
+  for (let i = 0; i < 120; i++) {
+    const s = document.createElement('div');
+    s.className = 'star';
+    const sz = Math.random() * 2 + 0.5;
+    s.style.cssText = `
+      width:${sz}px; height:${sz}px;
+      top:${Math.random()*100}%; left:${Math.random()*100}%;
+      --dur:${(Math.random()*5+3).toFixed(1)}s;
+      --delay:${(Math.random()*5).toFixed(1)}s;
+      --min-op:${(Math.random()*0.2+0.05).toFixed(2)};
+      --max-op:${(Math.random()*0.5+0.4).toFixed(2)};
+    `;
+    sf.appendChild(s);
+  }
+})();
+
+// ── DATE/TIME ──────────────────────────────────────────────
+(function() {
+  const now = new Date();
+  const opts = { weekday:'long', year:'numeric', month:'long', day:'numeric' };
+  document.getElementById('hero-date').textContent = now.toLocaleDateString('en-US', opts);
+  document.getElementById('footer-ts').textContent = 'Last updated: ' + now.toLocaleString('en-US');
+})();
+
+// ── WEATHER ────────────────────────────────────────────────
+const WMO = {
+  0:'Clear sky', 1:'Mainly clear', 2:'Partly cloudy', 3:'Overcast',
+  45:'Foggy', 48:'Rime fog',
+  51:'Light drizzle', 53:'Drizzle', 55:'Heavy drizzle',
+  61:'Light rain', 63:'Rain', 65:'Heavy rain',
+  71:'Light snow', 73:'Snow', 75:'Heavy snow', 77:'Snow grains',
+  80:'Light showers', 81:'Showers', 82:'Violent showers',
+  85:'Snow showers', 86:'Heavy snow showers',
+  95:'Thunderstorm', 96:'Thunderstorm w/ hail', 99:'Severe thunderstorm'
+};
+
+function weatherIcon(code) {
+  if (code === 0) return '☀️';
+  if (code <= 2) return '🌤️';
+  if (code === 3) return '☁️';
+  if (code <= 48) return '🌫️';
+  if (code <= 65) return '🌧️';
+  if (code <= 77) return '❄️';
+  if (code <= 82) return '🌦️';
+  if (code <= 86) return '🌨️';
+  return '⛈️';
+}
+
+async function fetchWeather(lat, lon, tempId, condId, windId) {
+  try {
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weathercode,windspeed_10m&temperature_unit=fahrenheit`;
+    const res = await fetch(url);
+    const data = await res.json();
+    const c = data.current;
+    const code = c.weathercode;
+    const icon = weatherIcon(code);
+    const label = WMO[code] || 'Unknown';
+    document.getElementById(tempId).textContent = Math.round(c.temperature_2m) + '°F';
+    document.getElementById(condId).textContent = icon + ' ' + label;
+    document.getElementById(windId).textContent = '💨 ' + Math.round(c.windspeed_10m) + ' mph winds';
+  } catch(e) {
+    document.getElementById(tempId).textContent = '—';
+    document.getElementById(condId).textContent = 'Could not load weather';
+  }
+}
+
+fetchWeather(37.7558, -122.5095, 'sf-temp', 'sf-cond', 'sf-wind');
+fetchWeather(50.1163, -122.9574, 'wh-temp', 'wh-cond', 'wh-wind');
+fetchWeather(38.5733, -109.5498, 'mo-temp', 'mo-cond', 'mo-wind');
+</script>
+</body>
+</html>
