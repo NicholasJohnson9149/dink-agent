@@ -161,6 +161,101 @@
   footer a { color: var(--accent); text-decoration: none; }
   footer a:hover { text-decoration: underline; }
   @media (max-width: 480px) { .grid { grid-template-columns: 1fr; } .hero-title { font-size: 2.4rem; } .cd-num { font-size: 1.8rem; } .cd-unit { min-width: 58px; padding: 12px 14px; } }
+
+  /* LAST UPDATED BADGE */
+  .hero-updated {
+    margin-top: 12px;
+    font-size: 0.75rem;
+    color: var(--muted);
+    letter-spacing: 0.5px;
+    opacity: 0.85;
+  }
+  .hero-updated strong { color: var(--accent); }
+
+  /* CHANGELOG SECTION */
+  .changelog-section {
+    margin: 60px 0 0;
+    border-top: 1px solid var(--border);
+    padding-top: 32px;
+  }
+  .changelog-toggle {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-family: 'Orbitron', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    padding: 0;
+    width: 100%;
+    text-align: left;
+    transition: color 0.25s;
+  }
+  .changelog-toggle:hover { color: var(--accent); }
+  .changelog-toggle::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, var(--border), transparent); }
+  .changelog-arrow {
+    font-size: 0.7rem;
+    transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+    display: inline-block;
+    color: var(--accent);
+  }
+  .changelog-toggle.open .changelog-arrow { transform: rotate(180deg); }
+  .changelog-body {
+    display: none;
+    margin-top: 20px;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    background: linear-gradient(145deg, var(--surface2), var(--surface));
+    overflow: hidden;
+    animation: fadeinup 0.35s ease both;
+  }
+  .changelog-body.open { display: block; }
+  .changelog-inner {
+    max-height: 320px;
+    overflow-y: auto;
+    padding: 20px 24px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
+  .changelog-inner::-webkit-scrollbar { width: 4px; }
+  .changelog-inner::-webkit-scrollbar-track { background: transparent; }
+  .changelog-inner::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+  .changelog-entry {
+    display: grid;
+    grid-template-columns: 130px 1fr;
+    gap: 16px;
+    padding: 14px 0;
+    border-bottom: 1px solid rgba(64,120,220,0.08);
+    align-items: flex-start;
+  }
+  .changelog-entry:last-child { border-bottom: none; padding-bottom: 0; }
+  .changelog-entry:first-child { padding-top: 0; }
+  .changelog-date {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.63rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--accent);
+    text-transform: uppercase;
+    line-height: 1.6;
+    padding-top: 2px;
+  }
+  .changelog-text {
+    font-size: 0.84rem;
+    color: var(--subtle);
+    line-height: 1.6;
+  }
+  .changelog-text strong { color: var(--text); }
+  .changelog-icon { margin-right: 6px; }
+  @media (max-width: 480px) {
+    .changelog-entry { grid-template-columns: 1fr; gap: 4px; }
+    .changelog-date { font-size: 0.58rem; }
+  }
+
 </style>
 </head>
 <body>
@@ -171,6 +266,7 @@
     <div class="hero-eyebrow">SpaceX &#183; Boca Chica, Texas &#183; Starbase</div>
     <h1 class="hero-title">STARSHIP</h1>
     <div class="hero-subtitle">Flight Tracker &nbsp;&middot;&nbsp; Integrated Flight Tests</div>
+    <div class="hero-updated">&#x1F551; Last updated: <strong>June 2025</strong></div>
     <div class="countdown-section">
       <div class="countdown-label">&#x2193; Next Launch Countdown</div>
       <div class="countdown-mission"><strong>Flight 14</strong> &mdash; V3 Starship (B21 + S41) &middot; NET September 2026</div>
@@ -189,12 +285,12 @@
   <div class="next-launch-banner">
     <div>
       <div class="nlb-eyebrow">&#x2B21; Next Scheduled Flight</div>
-      <div class="nlb-title">IFT-14 &mdash; First Ship Catch Attempt &#129431;</div>
+      <div class="nlb-title">Starship Flight 14 &mdash; Version 3 Campaign</div>
       <div class="nlb-meta">
-        <strong>Vehicle:</strong> Ship TBD + Super Heavy TBD (Block 3) &nbsp;&middot;&nbsp; OLP-2, Starbase TX<br>
-        <strong>Target:</strong> TBD Late 2026<br>
-        <strong>Mission:</strong> First Mechazilla catch of Starship upper stage (Ship) &middot; Full dual-catch attempt<br>
-        <strong>Status:</strong> TBD &mdash; pending FAA license and hardware readiness
+        <strong>Vehicle:</strong> Booster 21 (V3 Super Heavy) + Ship 41 (V3 Starship)<br>
+        <strong>Target:</strong> NET Early September 2026 &nbsp;&middot;&nbsp; OLP-2, Starbase TX<br>
+        <strong>Objectives:</strong> 2nd V3 flight &middot; Booster catch attempt &middot; Orbital trajectory push<br>
+        <strong>Status:</strong> 33-engine static fire complete &middot; Pre-flight checklist in progress
       </div>
     </div>
     <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end;">
@@ -205,19 +301,19 @@
 
   <div class="stats-bar">
     <div class="stat-card" style="--accent-line: linear-gradient(90deg, var(--accent), var(--accent3));">
-      <div class="stat-num" style="color:var(--accent)">14</div>
+      <div class="stat-num" style="color:var(--accent)">13</div>
       <div class="stat-lbl">Total Flights</div>
     </div>
     <div class="stat-card" style="--accent-line: linear-gradient(90deg, var(--green), #00c853);">
-      <div class="stat-num" style="color:var(--green)">9</div>
+      <div class="stat-num" style="color:var(--green)">6</div>
       <div class="stat-lbl">Full Successes</div>
     </div>
     <div class="stat-card" style="--accent-line: linear-gradient(90deg, var(--yellow), var(--orange));">
-      <div class="stat-num" style="color:var(--yellow)">2</div>
+      <div class="stat-num" style="color:var(--yellow)">4</div>
       <div class="stat-lbl">Partial Success</div>
     </div>
     <div class="stat-card" style="--accent-line: linear-gradient(90deg, var(--red), #ff1744);">
-      <div class="stat-num" style="color:var(--red)">2</div>
+      <div class="stat-num" style="color:var(--red)">3</div>
       <div class="stat-lbl">Failures</div>
     </div>
     <div class="stat-card" style="--accent-line: linear-gradient(90deg, var(--accent2), #b47aff);">
@@ -239,7 +335,7 @@
     <button class="filter-btn" onclick="filterCards('partial',this)">&#9889; Partial</button>
     <button class="filter-btn" onclick="filterCards('failure',this)">&#10007; Failure</button>
   </div>
-  <div class="section-label">Flight History &mdash; IFT-1 through IFT-14</div>
+  <div class="section-label">Flight History &mdash; IFT-1 through IFT-13 &amp; Upcoming</div>
   <div class="grid" id="flightGrid">
 
     <div class="flight-card" data-status="failure" data-type="completed" style="animation-delay:0.05s">
@@ -418,24 +514,24 @@
       </div>
     </div>
 
-    <div class="flight-card" data-status="success" data-type="completed" style="animation-delay:0.45s">
+    <div class="flight-card" data-status="failure" data-type="completed" style="animation-delay:0.45s">
       <div class="card-header">
         <div>
           <div class="card-flight-num">Flight 9 &middot; IFT-9</div>
           <div class="card-mission">Ninth Integrated Flight Test</div>
           <div class="card-date">May 27, 2025 &middot; 23:36 UTC</div>
         </div>
-        <span class="status-badge badge-success">Success</span>
+        <span class="status-badge badge-failure">Failure</span>
       </div>
       <div class="card-body">
         <div class="card-vehicles">
-          <span>Vehicle:</span> Ship 36 + Super Heavy Booster 14-3 (Block 2)<br>
-          <span>Duration:</span> Full mission profile
+          <span>Vehicle:</span> Ship 35 + Super Heavy Booster 14-2 (3rd flight &mdash; first triple-reuse booster ever)<br>
+          <span>Duration:</span> Ship reached orbit
         </div>
-        <ul class="milestones-list"><li>&#127775; Full mission success after IFT-8 failure</li><li>Ship reached orbital trajectory with attitude control confirmed</li><li>Booster performed successful landing burn</li><li>Ship completed controlled reentry and splashdown</li><li>Program returned to flight following FAA clearance</li><li>Key confidence-builder ahead of Block 3 debut</li></ul>
+        <ul class="milestones-list"><li>B14 flew for record 3rd time &mdash; unprecedented in spaceflight</li><li>Ship reached orbital trajectory but lost attitude control</li><li>Methane leak caused attitude control failure mid-flight</li><li>Booster RUD during landing burn over Gulf of Mexico</li><li>Ship disintegrated during reentry over Indian Ocean</li><li>FAA mishap investigation; 8 Starlink simulators lost</li></ul>
         <div class="card-outcomes">
-          <span class="outcome-chip chip-booster-success">&#9989; Booster: Splashdown</span>
-          <span class="outcome-chip chip-ship-success">&#9989; Ship: Splashdown</span>
+          <span class="outcome-chip chip-booster-fail">&#128997; Booster: RUD landing</span>
+          <span class="outcome-chip chip-ship-fail">&#128997; Ship: RUD reentry</span>
         </div>
       </div>
     </div>
@@ -484,23 +580,23 @@
       </div>
     </div>
 
-    <div class="flight-card" data-status="success" data-type="completed" style="animation-delay:0.60s">
+    <div class="flight-card" data-status="partial" data-type="completed" style="animation-delay:0.60s">
       <div class="card-header">
         <div>
           <div class="card-flight-num">Flight 12 &middot; IFT-12</div>
-          <div class="card-mission">Starship V3 Debut &mdash; Raptor 3 &#127942;</div>
+          <div class="card-mission">Starship V3 Debut &mdash; Raptor 3</div>
           <div class="card-date">May 22, 2026</div>
         </div>
-        <span class="status-badge badge-success">Success &#127942;</span>
+        <span class="status-badge badge-partial">Partial</span>
       </div>
       <div class="card-body">
         <div class="card-vehicles">
           <span>Vehicle:</span> Ship 39 + Super Heavy Booster 19 (V3 &mdash; Raptor 3 engines) &mdash; from OLP-2<br>
           <span>Duration:</span> Sub-orbital
         </div>
-        <ul class="milestones-list"><li>&#127775; FIRST ever Raptor 3 engine flight &mdash; new engine generation</li><li>FIRST launch from new OLP-2 pad at Starbase (OLP-2)</li><li>Ship 39 deployed 20+ Starlink simulators successfully</li><li>Booster 19 completed successful landing burn and splashdown</li><li>Full Block 3 / Raptor 3 hardware validated end-to-end</li><li>Major milestone: all primary objectives achieved on debut flight</li></ul>
+        <ul class="milestones-list"><li>FIRST ever Raptor 3 engine flight &mdash; new engine generation</li><li>FIRST launch from new OLP-2 pad at Starbase</li><li>Ship deployed 22 Starlink simulators successfully</li><li>Booster had off-nominal boostback &mdash; several engines lost</li><li>Booster lost control; transonic impact on descent</li><li>FAA investigated; 4 corrective actions cleared for F13</li></ul>
         <div class="card-outcomes">
-          <span class="outcome-chip chip-booster-success">&#9989; Booster: Splashdown</span>
+          <span class="outcome-chip chip-booster-fail">&#128997; Booster: Transonic impact</span>
           <span class="outcome-chip chip-ship-success">&#9989; Ship: Mission complete</span>
         </div>
       </div>
@@ -531,18 +627,18 @@
     <div class="flight-card" data-status="upcoming" data-type="upcoming" style="animation-delay:0.70s">
       <div class="card-header">
         <div>
-          <div class="card-flight-num">Flight 14 &middot; IFT-14</div>
-          <div class="card-mission">First Mechazilla Ship Catch Attempt &#129431;</div>
-          <div class="card-date">TBD Late 2026 &middot; OLP-2, Starbase TX</div>
+          <div class="card-flight-num">Flight 14 &middot; Upcoming</div>
+          <div class="card-mission">Second V3 Flight Test</div>
+          <div class="card-date">NET Early September 2026 &middot; OLP-2, Starbase TX</div>
         </div>
         <span class="status-badge badge-upcoming">Upcoming</span>
       </div>
       <div class="card-body">
         <div class="card-vehicles">
-          <span>Vehicle:</span> Ship TBD + Super Heavy TBD (Block 3)<br>
-          <span>Duration:</span> TBD Late 2026
+          <span>Vehicle:</span> Ship 41 + Super Heavy Booster 21 (V3)<br>
+          <span>Duration:</span> NET September 2026
         </div>
-        <ul class="milestones-list"><li>&#129431; FIRST EVER Mechazilla catch of a Starship upper stage (Ship)</li><li>Both booster and Ship catch planned at OLP-2</li><li>Builds on IFT-13 success and booster catch experience from IFT-5</li><li>Key milestone toward full and rapid reusability of both stages</li><li>Critical step toward NASA Artemis III crewed lunar landing (2027+)</li><li>Date TBD &mdash; pending FAA license and hardware readiness</li></ul>
+        <ul class="milestones-list"><li>Second full V3 Starship flight test</li><li>Booster 21: new V3 Super Heavy &mdash; static fire complete</li><li>Potential booster catch attempt at Mechazilla on Pad 2</li><li>Expanded objectives based on Flight 12 &amp; 13 learnings</li><li>Key milestone toward NASA Artemis III crewed lunar landing (2027)</li><li>Potential orbital trajectory if all systems nominal</li></ul>
         <div class="card-outcomes">
           <span class="outcome-chip chip-upcoming">&#9203; Booster: TBD</span>
           <span class="outcome-chip chip-upcoming">&#9203; Ship: TBD</span>
@@ -551,6 +647,40 @@
     </div>
   </div>
 </div>
+
+
+  <!-- UPDATE HISTORY / CHANGELOG -->
+  <div class="changelog-section">
+    <button class="changelog-toggle" onclick="toggleChangelog(this)" aria-expanded="false">
+      <span>&#x1F4C5; Update History</span>
+      <span class="changelog-arrow">&#x25BC;</span>
+    </button>
+    <div class="changelog-body" id="changelogBody">
+      <div class="changelog-inner">
+        <div class="changelog-entry">
+          <div class="changelog-date">Jun 2025</div>
+          <div class="changelog-text">
+            <span class="changelog-icon">&#x2728;</span>
+            <strong>Redesign:</strong> Animated starfield background, Orbitron font integration, live countdown to IFT&#8209;14, card layout with hover effects and outcome chips.
+          </div>
+        </div>
+        <div class="changelog-entry">
+          <div class="changelog-date">Jun 2025</div>
+          <div class="changelog-text">
+            <span class="changelog-icon">&#x1F527;</span>
+            <strong>Data fix:</strong> Corrected flight dates across all entries; added full IFT&#8209;13 mission data including vehicle details and milestones.
+          </div>
+        </div>
+        <div class="changelog-entry">
+          <div class="changelog-date">May 2025</div>
+          <div class="changelog-text">
+            <span class="changelog-icon">&#x1F680;</span>
+            <strong>Initial launch:</strong> Basic Starship flight tracker created with static flight history and mission status indicators.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
 <footer>
   <p>
@@ -561,7 +691,7 @@
     <a href="https://www.spacex.com" target="_blank">SpaceX.com</a>
   </p>
   <p>Not affiliated with SpaceX. For educational and tracking purposes only.</p>
-  <p style="margin-top:4px;opacity:0.5;font-size:0.72rem;">Last updated: September 2, 2026 &nbsp;&middot;&nbsp; Starship Program &mdash; Integrated Flight Tests IFT-1 through IFT-13 completed, IFT-14 upcoming</p>
+  <p style="margin-top:4px;opacity:0.5;font-size:0.72rem;">Last updated: September 2, 2026 &nbsp;&middot;&nbsp; Starship Program &mdash; Integrated Flight Tests IFT-1 through IFT-14</p>
 </footer>
 
 <script>
@@ -595,7 +725,7 @@
 
 // COUNTDOWN - NET Sept 5 2026 00:00 UTC
 (function() {
-  var target = new Date('2027-01-01T00:00:00Z').getTime(); // IFT-14 date TBD
+  var target = new Date('2026-09-05T00:00:00Z').getTime();
   function pad(n) { return String(n).padStart(2,'0'); }
   function tick() {
     var now = Date.now();
@@ -630,6 +760,15 @@ function filterCards(type, btn) {
     else if (type === 'failure') show = s === 'failure';
     card.classList.toggle('hidden', !show);
   });
+}
+
+// CHANGELOG TOGGLE
+function toggleChangelog(btn) {
+  var body = document.getElementById('changelogBody');
+  var isOpen = body.classList.contains('open');
+  body.classList.toggle('open', !isOpen);
+  btn.classList.toggle('open', !isOpen);
+  btn.setAttribute('aria-expanded', !isOpen);
 }
 </script>
 </body>
