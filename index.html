@@ -1,897 +1,515 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>🚀 Starship Launch Tracker</title>
-  <style>
-    /* ── RESET & BASE ───────────────────────────────────────────── */
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Starship Launch Tracker</title>
+<style>
+  :root {
+    --bg: #040b1a;
+    --surface: #071428;
+    --surface2: #0a1f3d;
+    --border: #1a3a6b;
+    --accent: #00d4ff;
+    --accent2: #7b2fff;
+    --green: #00e676;
+    --yellow: #ffd740;
+    --red: #ff5252;
+    --blue: #40c4ff;
+    --orange: #ff9100;
+    --text: #e8f4ff;
+    --muted: #6a8fbc;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    min-height: 100vh;
+    background-image:
+      radial-gradient(ellipse at 20% 50%, rgba(123,47,255,0.08) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 20%, rgba(0,212,255,0.06) 0%, transparent 50%);
+  }
 
-    :root {
-      --bg:        #040b1a;
-      --surface:   #0b1628;
-      --surface2:  #10203a;
-      --border:    #1e3356;
-      --accent:    #00b4ff;
-      --accent2:   #7b2fff;
-      --text:      #e8f0fe;
-      --muted:     #6880a0;
+  /* STARS */
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-image:
+      radial-gradient(1px 1px at 10% 15%, rgba(255,255,255,0.6) 0%, transparent 100%),
+      radial-gradient(1px 1px at 25% 8%, rgba(255,255,255,0.5) 0%, transparent 100%),
+      radial-gradient(1px 1px at 45% 22%, rgba(255,255,255,0.7) 0%, transparent 100%),
+      radial-gradient(1px 1px at 60% 5%, rgba(255,255,255,0.4) 0%, transparent 100%),
+      radial-gradient(1px 1px at 75% 18%, rgba(255,255,255,0.6) 0%, transparent 100%),
+      radial-gradient(1px 1px at 90% 10%, rgba(255,255,255,0.5) 0%, transparent 100%),
+      radial-gradient(1px 1px at 5% 40%, rgba(255,255,255,0.4) 0%, transparent 100%),
+      radial-gradient(1px 1px at 35% 35%, rgba(255,255,255,0.6) 0%, transparent 100%),
+      radial-gradient(1px 1px at 55% 48%, rgba(255,255,255,0.3) 0%, transparent 100%),
+      radial-gradient(1px 1px at 80% 42%, rgba(255,255,255,0.5) 0%, transparent 100%),
+      radial-gradient(1px 1px at 15% 65%, rgba(255,255,255,0.6) 0%, transparent 100%),
+      radial-gradient(1px 1px at 40% 70%, rgba(255,255,255,0.4) 0%, transparent 100%),
+      radial-gradient(1px 1px at 65% 62%, rgba(255,255,255,0.5) 0%, transparent 100%),
+      radial-gradient(1px 1px at 88% 75%, rgba(255,255,255,0.7) 0%, transparent 100%),
+      radial-gradient(1px 1px at 22% 85%, rgba(255,255,255,0.4) 0%, transparent 100%),
+      radial-gradient(1px 1px at 50% 90%, rgba(255,255,255,0.5) 0%, transparent 100%),
+      radial-gradient(1px 1px at 70% 88%, rgba(255,255,255,0.6) 0%, transparent 100%),
+      radial-gradient(2px 2px at 30% 55%, rgba(0,212,255,0.4) 0%, transparent 100%),
+      radial-gradient(2px 2px at 72% 30%, rgba(123,47,255,0.3) 0%, transparent 100%);
+    pointer-events: none;
+    z-index: 0;
+  }
 
-      --green:  #00e676;
-      --red:    #ff1744;
-      --yellow: #ffc400;
-      --blue:   #29b6f6;
-      --gray:   #78909c;
-    }
+  .wrapper { position: relative; z-index: 1; max-width: 1200px; margin: 0 auto; padding: 0 16px 60px; }
 
-    html { font-size: 16px; scroll-behavior: smooth; }
+  /* HEADER */
+  header {
+    text-align: center;
+    padding: 48px 16px 32px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 32px;
+  }
+  .logo { font-size: 3rem; margin-bottom: 8px; }
+  header h1 {
+    font-size: clamp(1.8rem, 5vw, 3rem);
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1.1;
+  }
+  header p { color: var(--muted); margin-top: 10px; font-size: 1rem; }
+  .updated { font-size: 0.78rem; color: var(--muted); margin-top: 8px; opacity: 0.7; }
 
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-      min-height: 100vh;
-      overflow-x: hidden;
-    }
+  /* NEXT LAUNCH HERO */
+  .hero {
+    background: linear-gradient(135deg, var(--surface2) 0%, #0d1f42 100%);
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--accent);
+    border-radius: 16px;
+    padding: 28px;
+    margin-bottom: 32px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 24px;
+    align-items: center;
+  }
+  @media (max-width: 600px) { .hero { grid-template-columns: 1fr; } }
+  .hero-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 6px;
+  }
+  .hero h2 { font-size: clamp(1.4rem, 4vw, 2rem); font-weight: 700; }
+  .hero-meta { color: var(--muted); font-size: 0.9rem; margin-top: 8px; line-height: 1.6; }
+  .hero-meta span { color: var(--text); font-weight: 600; }
 
-    /* ── STARFIELD BACKGROUND ───────────────────────────────────── */
-    #starfield {
-      position: fixed; inset: 0; z-index: 0;
-      background: radial-gradient(ellipse at 20% 50%, #0d1b3e 0%, #040b1a 70%);
-      overflow: hidden;
-      pointer-events: none;
-    }
-    .star {
-      position: absolute;
-      border-radius: 50%;
-      background: #fff;
-      animation: twinkle var(--d, 3s) ease-in-out infinite var(--delay, 0s);
-      opacity: 0;
-    }
-    @keyframes twinkle {
-      0%, 100% { opacity: 0; transform: scale(0.8); }
-      50%       { opacity: var(--max-op, 0.8); transform: scale(1); }
-    }
+  /* COUNTDOWN */
+  .countdown-box { text-align: center; min-width: 200px; }
+  .countdown-title { font-size: 0.72rem; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+  .countdown-grid { display: flex; gap: 8px; justify-content: center; }
+  .countdown-unit {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 14px;
+    min-width: 60px;
+  }
+  .countdown-num { font-size: 1.8rem; font-weight: 800; color: var(--accent); line-height: 1; font-variant-numeric: tabular-nums; }
+  .countdown-lbl { font-size: 0.65rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; }
+  .countdown-tbd { font-size: 1.5rem; font-weight: 700; color: var(--yellow); letter-spacing: 2px; padding: 16px; }
 
-    /* ── LAYOUT ─────────────────────────────────────────────────── */
-    #app { position: relative; z-index: 1; max-width: 1200px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+  /* STATS BAR */
+  .stats { display: flex; gap: 12px; margin-bottom: 32px; flex-wrap: wrap; }
+  .stat-card {
+    flex: 1;
+    min-width: 120px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    text-align: center;
+  }
+  .stat-num { font-size: 2rem; font-weight: 800; }
+  .stat-lbl { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; }
 
-    /* ── HEADER ─────────────────────────────────────────────────── */
-    header {
-      text-align: center;
-      padding: 2.5rem 0 2rem;
-      border-bottom: 1px solid var(--border);
-      margin-bottom: 2.5rem;
-    }
-    header .logo {
-      font-size: 2.8rem;
-      margin-bottom: 0.25rem;
-      animation: rocketBounce 2.5s ease-in-out infinite;
-      display: inline-block;
-    }
-    @keyframes rocketBounce {
-      0%, 100% { transform: translateY(0); }
-      50%       { transform: translateY(-8px); }
-    }
-    header h1 {
-      font-size: clamp(1.6rem, 4vw, 2.6rem);
-      font-weight: 800;
-      letter-spacing: 0.04em;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      margin-bottom: 0.4rem;
-    }
-    header p {
-      color: var(--muted);
-      font-size: 0.95rem;
-    }
+  /* FILTERS */
+  .filters { display: flex; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; }
+  .filter-btn {
+    padding: 8px 20px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--muted);
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.5px;
+  }
+  .filter-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .filter-btn.active { background: var(--accent); border-color: var(--accent); color: #000; }
 
-    /* ── COUNTDOWN ──────────────────────────────────────────────── */
-    #countdown-section {
-      background: linear-gradient(135deg, #071430 0%, #0d1e40 100%);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 1.75rem 2rem;
-      margin-bottom: 2rem;
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 1.5rem;
-      position: relative;
-      overflow: hidden;
-    }
-    #countdown-section::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(135deg, rgba(0,180,255,0.05) 0%, rgba(123,47,255,0.05) 100%);
-      pointer-events: none;
-    }
-    .countdown-label {
-      flex: 1 1 200px;
-    }
-    .countdown-label .next-badge {
-      display: inline-block;
-      background: linear-gradient(90deg, var(--accent), var(--accent2));
-      color: #fff;
-      font-size: 0.65rem;
-      font-weight: 700;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      padding: 0.2em 0.75em;
-      border-radius: 99px;
-      margin-bottom: 0.5rem;
-    }
-    .countdown-label h2 {
-      font-size: 1.25rem;
-      font-weight: 700;
-      margin-bottom: 0.15rem;
-    }
-    .countdown-label p {
-      color: var(--muted);
-      font-size: 0.85rem;
-    }
-    #countdown-clock {
-      display: flex;
-      gap: 1rem;
-      flex-wrap: wrap;
-    }
-    .clock-unit {
-      text-align: center;
-      min-width: 64px;
-    }
-    .clock-unit .digits {
-      display: block;
-      font-size: 2.4rem;
-      font-weight: 800;
-      font-variant-numeric: tabular-nums;
-      line-height: 1;
-      background: linear-gradient(180deg, #fff 40%, var(--accent) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      animation: pulse 1s ease-in-out infinite;
-    }
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50%       { opacity: 0.75; }
-    }
-    .clock-unit .unit-label {
-      display: block;
-      font-size: 0.6rem;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.15em;
-      margin-top: 0.3rem;
-    }
-    .clock-sep {
-      font-size: 2rem;
-      font-weight: 800;
-      color: var(--border);
-      align-self: center;
-      line-height: 1;
-      animation: pulse 1s ease-in-out infinite;
-    }
-    #no-upcoming {
-      color: var(--muted);
-      font-style: italic;
-    }
+  /* TABLE */
+  .table-wrap { overflow-x: auto; border-radius: 14px; border: 1px solid var(--border); }
+  table { width: 100%; border-collapse: collapse; min-width: 700px; }
+  thead { background: var(--surface2); }
+  thead th {
+    padding: 14px 16px;
+    text-align: left;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+  tbody tr {
+    border-bottom: 1px solid rgba(26,58,107,0.5);
+    transition: background 0.15s;
+  }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: rgba(0,212,255,0.04); }
+  tbody tr.hidden { display: none; }
+  td {
+    padding: 14px 16px;
+    font-size: 0.88rem;
+    vertical-align: top;
+  }
+  .flight-num { font-weight: 800; color: var(--accent); font-size: 1rem; }
+  .mission-name { font-weight: 600; color: var(--text); }
+  .date-cell { color: var(--muted); white-space: nowrap; font-size: 0.82rem; }
+  .milestones { font-size: 0.8rem; color: var(--muted); line-height: 1.7; }
+  .milestones li { list-style: none; padding-left: 0; }
+  .milestones li::before { content: '◆ '; color: var(--accent); font-size: 0.6rem; vertical-align: middle; }
+  .notes { font-size: 0.8rem; color: var(--muted); font-style: italic; }
 
-    /* ── STATS BAR ──────────────────────────────────────────────── */
-    #stats {
-      display: flex;
-      gap: 1rem;
-      flex-wrap: wrap;
-      margin-bottom: 2rem;
-    }
-    .stat-card {
-      flex: 1 1 120px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 1rem 1.25rem;
-      text-align: center;
-      transition: transform 0.2s, border-color 0.2s;
-    }
-    .stat-card:hover { transform: translateY(-3px); border-color: var(--accent); }
-    .stat-card .val {
-      font-size: 2rem;
-      font-weight: 800;
-      line-height: 1;
-      margin-bottom: 0.2rem;
-    }
-    .stat-card .lbl { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; }
-    .stat-total  .val { color: var(--accent); }
-    .stat-success .val { color: var(--green); }
-    .stat-partial .val { color: var(--yellow); }
-    .stat-fail   .val { color: var(--red); }
-    .stat-up     .val { color: var(--blue); }
+  /* STATUS BADGES */
+  .badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .badge-success { background: rgba(0,230,118,0.15); color: var(--green); border: 1px solid rgba(0,230,118,0.3); }
+  .badge-partial { background: rgba(255,215,64,0.15); color: var(--yellow); border: 1px solid rgba(255,215,64,0.3); }
+  .badge-failure { background: rgba(255,82,82,0.15); color: var(--red); border: 1px solid rgba(255,82,82,0.3); }
+  .badge-upcoming { background: rgba(64,196,255,0.15); color: var(--blue); border: 1px solid rgba(64,196,255,0.3); }
 
-    /* ── FILTER BUTTONS ─────────────────────────────────────────── */
-    #filters {
-      display: flex;
-      gap: 0.5rem;
-      flex-wrap: wrap;
-      margin-bottom: 1.25rem;
-    }
-    .filter-btn {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      color: var(--muted);
-      padding: 0.45em 1.1em;
-      border-radius: 99px;
-      font-size: 0.85rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background 0.2s, color 0.2s, border-color 0.2s, transform 0.15s;
-    }
-    .filter-btn:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-2px); }
-    .filter-btn.active {
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      border-color: transparent;
-      color: #fff;
-      box-shadow: 0 0 16px rgba(0,180,255,0.4);
-    }
-
-    /* ── TABLE CONTAINER ────────────────────────────────────────── */
-    #table-wrap {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      overflow: hidden;
-      box-shadow: 0 8px 48px rgba(0,0,0,0.5);
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-
-    /* ── TABLE HEAD ─────────────────────────────────────────────── */
-    thead th {
-      background: var(--surface2);
-      padding: 0.85rem 1rem;
-      text-align: left;
-      font-size: 0.75rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      color: var(--muted);
-      border-bottom: 1px solid var(--border);
-      white-space: nowrap;
-      cursor: pointer;
-      user-select: none;
-      transition: color 0.2s;
-    }
-    thead th:hover { color: var(--accent); }
-    thead th .sort-icon { margin-left: 4px; opacity: 0.4; font-size: 0.65rem; }
-    thead th.sorted .sort-icon { opacity: 1; color: var(--accent); }
-
-    /* ── TABLE BODY ROWS ────────────────────────────────────────── */
-    tbody tr {
-      border-bottom: 1px solid var(--border);
-      cursor: pointer;
-      transition: background 0.18s;
-    }
-    tbody tr:last-child { border-bottom: none; }
-    tbody tr:hover { background: rgba(0,180,255,0.06); }
-    tbody tr.expanded { background: rgba(0,180,255,0.08); }
-    tbody tr.hidden { display: none; }
-
-    tbody td {
-      padding: 0.85rem 1rem;
-      font-size: 0.88rem;
-      vertical-align: middle;
-    }
-    td.flight-num {
-      font-weight: 800;
-      font-size: 0.95rem;
-      color: var(--accent);
-      white-space: nowrap;
-    }
-    td.mission { font-weight: 600; }
-
-    /* ── STATUS BADGES ──────────────────────────────────────────── */
-    .badge {
-      display: inline-block;
-      padding: 0.25em 0.75em;
-      border-radius: 99px;
-      font-size: 0.72rem;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      white-space: nowrap;
-    }
-    .badge-success  { background: rgba(0,230,118,0.15);  color: var(--green);  border: 1px solid rgba(0,230,118,0.4); }
-    .badge-failure  { background: rgba(255,23,68,0.15);  color: var(--red);    border: 1px solid rgba(255,23,68,0.4); }
-    .badge-partial  { background: rgba(255,196,0,0.15);  color: var(--yellow); border: 1px solid rgba(255,196,0,0.4); }
-    .badge-upcoming { background: rgba(41,182,246,0.15); color: var(--blue);   border: 1px solid rgba(41,182,246,0.4); }
-    .badge-tbd      { background: rgba(120,144,156,0.15);color: var(--gray);   border: 1px solid rgba(120,144,156,0.4); }
-
-    /* ── EXPAND ROW ─────────────────────────────────────────────── */
-    .expand-row td {
-      padding: 0;
-      background: #06101f;
-    }
-    .expand-content {
-      padding: 1.25rem 1.5rem;
-      display: none;
-      animation: fadeIn 0.25s ease;
-      border-top: 1px solid var(--border);
-    }
-    .expand-content.open { display: block; }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(-6px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-    .expand-content h3 {
-      font-size: 1rem;
-      margin-bottom: 0.75rem;
-      color: var(--accent);
-    }
-    .expand-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-      gap: 1rem;
-      margin-bottom: 1rem;
-    }
-    .expand-field label {
-      display: block;
-      font-size: 0.68rem;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      color: var(--muted);
-      margin-bottom: 0.25rem;
-    }
-    .expand-field p { font-size: 0.9rem; }
-    .video-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      color: var(--accent);
-      text-decoration: none;
-      font-weight: 600;
-      font-size: 0.85rem;
-      border: 1px solid var(--accent);
-      padding: 0.4em 1em;
-      border-radius: 8px;
-      transition: background 0.2s, color 0.2s;
-    }
-    .video-link:hover { background: var(--accent); color: #000; }
-    .chevron {
-      display: inline-block;
-      transition: transform 0.25s;
-      color: var(--muted);
-      font-size: 0.75rem;
-    }
-    .expanded .chevron { transform: rotate(180deg); color: var(--accent); }
-
-    /* ── EMPTY STATE ────────────────────────────────────────────── */
-    #empty {
-      display: none;
-      text-align: center;
-      padding: 3rem 1rem;
-      color: var(--muted);
-    }
-    #empty .icon { font-size: 3rem; margin-bottom: 0.5rem; }
-
-    /* ── FOOTER ─────────────────────────────────────────────────── */
-    footer {
-      text-align: center;
-      margin-top: 3rem;
-      color: var(--muted);
-      font-size: 0.8rem;
-    }
-    footer a { color: var(--accent); text-decoration: none; }
-
-    /* ── RESPONSIVE ─────────────────────────────────────────────── */
-    @media (max-width: 768px) {
-      thead th:nth-child(4),
-      tbody td:nth-child(4),
-      thead th:nth-child(6),
-      tbody td:nth-child(6) { display: none; }
-      #countdown-section { flex-direction: column; text-align: center; }
-    }
-    @media (max-width: 520px) {
-      thead th:nth-child(3),
-      tbody td:nth-child(3) { display: none; }
-    }
-  </style>
+  /* FOOTER */
+  footer {
+    text-align: center;
+    padding: 32px 16px 16px;
+    color: var(--muted);
+    font-size: 0.8rem;
+    border-top: 1px solid var(--border);
+    margin-top: 48px;
+  }
+  footer a { color: var(--accent); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+</style>
 </head>
 <body>
+<div class="wrapper">
 
-<!-- Starfield -->
-<div id="starfield"></div>
-
-<div id="app">
-  <!-- Header -->
   <header>
     <div class="logo">🚀</div>
     <h1>Starship Launch Tracker</h1>
-    <p>SpaceX Integrated Flight Tests — live data &amp; countdown</p>
+    <p>Every Integrated Flight Test — from first explosion to the Moon</p>
+    <p class="updated">Last updated: September 1, 2025</p>
   </header>
 
-  <!-- Countdown -->
-  <section id="countdown-section">
-    <div class="countdown-label">
-      <span class="next-badge">Next Launch</span>
-      <h2 id="next-mission-name">IFT-10</h2>
-      <p id="next-mission-detail">TBD 2025 · Boca Chica · Upcoming</p>
-    </div>
-    <div id="countdown-clock">
-      <div class="clock-unit">
-        <span class="digits" id="cd-days">--</span>
-        <span class="unit-label">Days</span>
-      </div>
-      <span class="clock-sep">:</span>
-      <div class="clock-unit">
-        <span class="digits" id="cd-hours">--</span>
-        <span class="unit-label">Hours</span>
-      </div>
-      <span class="clock-sep">:</span>
-      <div class="clock-unit">
-        <span class="digits" id="cd-mins">--</span>
-        <span class="unit-label">Mins</span>
-      </div>
-      <span class="clock-sep">:</span>
-      <div class="clock-unit">
-        <span class="digits" id="cd-secs">--</span>
-        <span class="unit-label">Secs</span>
+  <!-- NEXT LAUNCH HERO -->
+  <div class="hero">
+    <div class="hero-info">
+      <div class="hero-label">⚡ Next Launch</div>
+      <h2>IFT-12 — Starship V3 Debut</h2>
+      <div class="hero-meta">
+        <span>Vehicle:</span> Ship 39 (Block 3) + Booster 19 (Block 3)<br>
+        <span>Estimated Date:</span> ~May 2026 (TBD)<br>
+        <span>Launch Site:</span> Starbase, TX — OLP-2<br>
+        <span>Mission:</span> First flight of Starship Version 3 with Raptor 3 engines
       </div>
     </div>
-    <p id="no-upcoming" style="display:none;">No upcoming launch date set — check back soon.</p>
-  </section>
-
-  <!-- Stats -->
-  <div id="stats">
-    <div class="stat-card stat-total">
-      <div class="val" id="s-total">0</div>
-      <div class="lbl">Total Flights</div>
-    </div>
-    <div class="stat-card stat-success">
-      <div class="val" id="s-success">0</div>
-      <div class="lbl">Successes</div>
-    </div>
-    <div class="stat-card stat-partial">
-      <div class="val" id="s-partial">0</div>
-      <div class="lbl">Partial</div>
-    </div>
-    <div class="stat-card stat-fail">
-      <div class="val" id="s-fail">0</div>
-      <div class="lbl">Failures</div>
-    </div>
-    <div class="stat-card stat-up">
-      <div class="val" id="s-up">0</div>
-      <div class="lbl">Upcoming</div>
+    <div class="countdown-box">
+      <div class="countdown-title">Countdown</div>
+      <div class="countdown-tbd">T – TBD</div>
     </div>
   </div>
 
-  <!-- Filters -->
-  <div id="filters">
-    <button class="filter-btn active" data-filter="all">🌐 All</button>
-    <button class="filter-btn" data-filter="completed">✅ Completed</button>
-    <button class="filter-btn" data-filter="upcoming">🔵 Upcoming</button>
-    <button class="filter-btn" data-filter="tbd">⏳ TBD</button>
+  <!-- STATS -->
+  <div class="stats">
+    <div class="stat-card">
+      <div class="stat-num" style="color:var(--accent)">12</div>
+      <div class="stat-lbl">Total Flights</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" style="color:var(--green)">5</div>
+      <div class="stat-lbl">Full Successes</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" style="color:var(--yellow)">5</div>
+      <div class="stat-lbl">Partial Success</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" style="color:var(--red)">1</div>
+      <div class="stat-lbl">Failures</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" style="color:var(--blue)">2</div>
+      <div class="stat-lbl">Upcoming</div>
+    </div>
   </div>
 
-  <!-- Table -->
-  <div id="table-wrap">
-    <table id="launch-table" aria-label="Starship launch history">
+  <!-- FILTERS -->
+  <div class="filters">
+    <button class="filter-btn active" onclick="filter('all', this)">All Flights</button>
+    <button class="filter-btn" onclick="filter('completed', this)">✅ Completed</button>
+    <button class="filter-btn" onclick="filter('upcoming', this)">🔵 Upcoming</button>
+    <button class="filter-btn" onclick="filter('success', this)">🟢 Full Success</button>
+    <button class="filter-btn" onclick="filter('partial', this)">🟡 Partial</button>
+    <button class="filter-btn" onclick="filter('failure', this)">🔴 Failure</button>
+  </div>
+
+  <!-- TABLE -->
+  <div class="table-wrap">
+    <table id="launchTable">
       <thead>
         <tr>
-          <th data-col="flight"   class="sorted">Flight # <span class="sort-icon">▲</span></th>
-          <th data-col="mission">Mission <span class="sort-icon">↕</span></th>
-          <th data-col="date">Date <span class="sort-icon">↕</span></th>
-          <th data-col="site">Site <span class="sort-icon">↕</span></th>
-          <th data-col="goal">Payload / Goal <span class="sort-icon">↕</span></th>
-          <th data-col="status">Status <span class="sort-icon">↕</span></th>
-          <th style="width:32px;"></th>
+          <th>Flight</th>
+          <th>Mission Name</th>
+          <th>Date</th>
+          <th>Status</th>
+          <th>Key Milestones</th>
+          <th>Notes</th>
         </tr>
       </thead>
-      <tbody id="tbody"></tbody>
+      <tbody>
+
+        <tr data-status="failure" data-type="completed">
+          <td><div class="flight-num">IFT-1</div></td>
+          <td><div class="mission-name">First Integrated Flight Test</div></td>
+          <td class="date-cell">Apr 20, 2023</td>
+          <td><span class="badge badge-failure">Failure</span></td>
+          <td><ul class="milestones">
+            <li>First full-stack launch attempt</li>
+            <li>Cleared launch pad (unprecedented)</li>
+            <li>Vehicle failed to stage</li>
+            <li>Destroyed ~T+4 min</li>
+          </ul></td>
+          <td class="notes">Ship 24 + B7. RUD over Gulf of Mexico. Launch pad severely damaged. Proved the rocket can fly.</td>
+        </tr>
+
+        <tr data-status="partial" data-type="completed">
+          <td><div class="flight-num">IFT-2</div></td>
+          <td><div class="mission-name">Second Integrated Flight Test</div></td>
+          <td class="date-cell">Nov 18, 2023</td>
+          <td><span class="badge badge-partial">Partial</span></td>
+          <td><ul class="milestones">
+            <li>Introduced hot-staging ring</li>
+            <li>Reached space (~148 km)</li>
+            <li>Booster RUD after stage sep</li>
+            <li>Ship lost ~T+8 min</li>
+          </ul></td>
+          <td class="notes">Ship 25 + B9. First successful stage separation. Both vehicles lost. Steel catch arms ("Mechazilla") installed.</td>
+        </tr>
+
+        <tr data-status="partial" data-type="completed">
+          <td><div class="flight-num">IFT-3</div></td>
+          <td><div class="mission-name">Third Integrated Flight Test</div></td>
+          <td class="date-cell">Mar 14, 2024</td>
+          <td><span class="badge badge-partial">Partial</span></td>
+          <td><ul class="milestones">
+            <li>Reached near-orbital velocity</li>
+            <li>First successful hot staging</li>
+            <li>Payload door open/close test</li>
+            <li>Prop transfer demo attempted</li>
+            <li>Both vehicles lost on reentry</li>
+          </ul></td>
+          <td class="notes">Ship 28 + B10. Dramatic reentry plasma footage. Booster lost, ship disintegrated over Indian Ocean.</td>
+        </tr>
+
+        <tr data-status="success" data-type="completed">
+          <td><div class="flight-num">IFT-4</div></td>
+          <td><div class="mission-name">Fourth Integrated Flight Test</div></td>
+          <td class="date-cell">Jun 6, 2024</td>
+          <td><span class="badge badge-success">Success</span></td>
+          <td><ul class="milestones">
+            <li>First booster controlled splashdown</li>
+            <li>First ship controlled splashdown</li>
+            <li>Survived full reentry</li>
+            <li>Epic reentry plasma video</li>
+          </ul></td>
+          <td class="notes">Ship 29 + B11. Major milestone — first flight both vehicles survived. Changed trajectory of Starship program.</td>
+        </tr>
+
+        <tr data-status="success" data-type="completed">
+          <td><div class="flight-num">IFT-5</div></td>
+          <td><div class="mission-name">Fifth Integrated Flight Test</div></td>
+          <td class="date-cell">Oct 13, 2024</td>
+          <td><span class="badge badge-success">Success</span></td>
+          <td><ul class="milestones">
+            <li>First ever booster catch by Mechazilla 🦾</li>
+            <li>Ship splashdown in Indian Ocean</li>
+            <li>Chopstick arms worked perfectly</li>
+          </ul></td>
+          <td class="notes">Ship 30 + B12. Historic catch — the internet went wild. SpaceX called it "the most complex thing ever done."</td>
+        </tr>
+
+        <tr data-status="success" data-type="completed">
+          <td><div class="flight-num">IFT-6</div></td>
+          <td><div class="mission-name">Sixth Integrated Flight Test</div></td>
+          <td class="date-cell">Nov 19, 2024</td>
+          <td><span class="badge badge-success">Success</span></td>
+          <td><ul class="milestones">
+            <li>Second booster Mechazilla catch</li>
+            <li>Ship splashdown successful</li>
+            <li>Payload bay door demo</li>
+            <li>Raptor engine relight in space</li>
+          </ul></td>
+          <td class="notes">Ship 31 + B13. Demonstrated repeatability of booster catch. Raptor relight proves engine restart capability for lunar missions.</td>
+        </tr>
+
+        <tr data-status="partial" data-type="completed">
+          <td><div class="flight-num">IFT-7</div></td>
+          <td><div class="mission-name">Seventh Integrated Flight Test</div></td>
+          <td class="date-cell">Jan 16, 2025</td>
+          <td><span class="badge badge-partial">Partial</span></td>
+          <td><ul class="milestones">
+            <li>Third booster Mechazilla catch ✓</li>
+            <li>Ship exploded over Caribbean</li>
+            <li>Debris rained on region</li>
+            <li>FAA investigation opened</li>
+          </ul></td>
+          <td class="notes">Ship 33 + B14. Booster catch successful. Ship exploded ~T+8.5 min after stage sep — propellant leak suspected. Temporary no-fly zones issued.</td>
+        </tr>
+
+        <tr data-status="partial" data-type="completed">
+          <td><div class="flight-num">IFT-8</div></td>
+          <td><div class="mission-name">Eighth Integrated Flight Test</div></td>
+          <td class="date-cell">Mar 6, 2025</td>
+          <td><span class="badge badge-partial">Partial</span></td>
+          <td><ul class="milestones">
+            <li>Fourth booster catch ✓</li>
+            <li>First booster reflight (B14)</li>
+            <li>Ship lost during ascent</li>
+            <li>Propellant leak cause identified</li>
+          </ul></td>
+          <td class="notes">Ship 34 + B14 (reflight). First reuse of a Super Heavy booster. Ship lost due to propellant leak in payload bay — same issue as IFT-7.</td>
+        </tr>
+
+        <tr data-status="partial" data-type="completed">
+          <td><div class="flight-num">IFT-9</div></td>
+          <td><div class="mission-name">Ninth Integrated Flight Test</div></td>
+          <td class="date-cell">May 27, 2025</td>
+          <td><span class="badge badge-partial">Partial</span></td>
+          <td><ul class="milestones">
+            <li>B14 flew 3rd time (first ever)</li>
+            <li>Booster RUD on landing burn</li>
+            <li>Ship reached orbit</li>
+            <li>Methane leak → attitude loss</li>
+            <li>Ship disintegrated on reentry</li>
+          </ul></td>
+          <td class="notes">Ship 35 + B14-2. First triple-reuse of booster. Failed Starlink sim deployment. FAA mishap investigation for ship anomaly.</td>
+        </tr>
+
+        <tr data-status="success" data-type="completed">
+          <td><div class="flight-num">IFT-10</div></td>
+          <td><div class="mission-name">Tenth Integrated Flight Test</div></td>
+          <td class="date-cell">Aug 26, 2025</td>
+          <td><span class="badge badge-success">Success</span></td>
+          <td><ul class="milestones">
+            <li>Booster splashdown (Gulf of Mexico)</li>
+            <li>Ship splashdown (Indian Ocean)</li>
+            <li>Raptor relight in space ✓</li>
+            <li>First payload deployment (Starlink sims)</li>
+          </ul></td>
+          <td class="notes">Ship 37 + B16. Turned the tide after 3 failures. First successful payload deployment. Full mission success end-to-end.</td>
+        </tr>
+
+        <tr data-status="success" data-type="completed">
+          <td><div class="flight-num">IFT-11</div></td>
+          <td><div class="mission-name">Eleventh Integrated Flight Test</div></td>
+          <td class="date-cell">Oct 13, 2025</td>
+          <td><span class="badge badge-success">Success</span></td>
+          <td><ul class="milestones">
+            <li>Every major objective achieved</li>
+            <li>Booster soft splashdown (Gulf)</li>
+            <li>Ship splashdown 3/4 around Earth</li>
+            <li>Final V2 Starship flight</li>
+            <li>Final launch from Pad 1</li>
+          </ul></td>
+          <td class="notes">Ship 38 + B16 (reflight). Last V2 Starship and V1 Super Heavy ever. Closed out Gen 2 program. Paved way for V3 with Raptor 3.</td>
+        </tr>
+
+        <tr data-status="upcoming" data-type="upcoming">
+          <td><div class="flight-num">IFT-12</div></td>
+          <td><div class="mission-name">Starship V3 Debut</div></td>
+          <td class="date-cell">~May 2026<br><em style="font-size:0.75rem;color:var(--blue)">(Est.)</em></td>
+          <td><span class="badge badge-upcoming">Upcoming</span></td>
+          <td><ul class="milestones">
+            <li>First Starship V3 flight</li>
+            <li>First Raptor 3 engines</li>
+            <li>Taller, heavier vehicle (408 ft)</li>
+            <li>Launch from OLP-2 (new pad)</li>
+            <li>Ship 39 + Booster 19 (B3)</li>
+          </ul></td>
+          <td class="notes">Starship Block 3 — next-gen vehicle essential for NASA Artemis 4 lunar landing. Significantly upgraded from V2.</td>
+        </tr>
+
+        <tr data-status="upcoming" data-type="upcoming">
+          <td><div class="flight-num">IFT-13</div></td>
+          <td><div class="mission-name">Second V3 Flight Test</div></td>
+          <td class="date-cell">TBD 2026<br><em style="font-size:0.75rem;color:var(--blue)">(TBD)</em></td>
+          <td><span class="badge badge-upcoming">Upcoming</span></td>
+          <td><ul class="milestones">
+            <li>Second V3 test flight</li>
+            <li>Objectives TBD based on IFT-12</li>
+            <li>Potential booster catch attempt</li>
+          </ul></td>
+          <td class="notes">Details depend on IFT-12 outcomes. SpaceX aims for rapid iteration toward crewed Artemis lunar landings.</td>
+        </tr>
+
+      </tbody>
     </table>
-    <div id="empty">
-      <div class="icon">🔭</div>
-      <p>No launches match this filter.</p>
-    </div>
   </div>
 
   <footer>
-    <p>Data sourced from public SpaceX announcements · Updated manually · Not affiliated with SpaceX</p>
-    <p style="margin-top:0.4rem;">Built with ❤️ by <a href="https://github.com/NicholasJohnson9149" target="_blank">NicholasJohnson9149</a></p>
+    <p>Data sourced from <a href="https://www.spacex.com" target="_blank">SpaceX</a> and public launch records.
+    Built by a <a href="https://github.com/NicholasJohnson9149/dink-agent" target="_blank">dink-agent</a> 🤖</p>
+    <p style="margin-top:8px">Not affiliated with SpaceX. For entertainment and tracking purposes only.</p>
   </footer>
+
 </div>
 
 <script>
-/* ── DATA ────────────────────────────────────────────────────────── */
-const LAUNCHES = [
-  {
-    flight: 1,
-    mission: "IFT-1",
-    dateStr: "Apr 20, 2023",
-    dateSort: new Date("2023-04-20"),
-    site: "Boca Chica, TX",
-    goal: "First integrated flight test",
-    status: "failure",
-    notes: "Vehicle broke apart ~4 minutes after liftoff. First ever integrated launch of Starship + Super Heavy. Stage separation not achieved. Both vehicles destroyed.",
-    video: "https://www.youtube.com/watch?v=hFfQkSmQlkg"
-  },
-  {
-    flight: 2,
-    mission: "IFT-2",
-    dateStr: "Nov 18, 2023",
-    dateSort: new Date("2023-11-18"),
-    site: "Boca Chica, TX",
-    goal: "Hot staging separation test",
-    status: "partial",
-    notes: "Hot-stage separation achieved — a world first. Super Heavy booster lost after stage separation. Ship reached space but lost contact during reentry. Significant progress over IFT-1.",
-    video: "https://www.youtube.com/watch?v=9RUBiO4STVE"
-  },
-  {
-    flight: 3,
-    mission: "IFT-3",
-    dateStr: "Mar 14, 2024",
-    dateSort: new Date("2024-03-14"),
-    site: "Boca Chica, TX",
-    goal: "Reentry & payload door test",
-    status: "partial",
-    notes: "Ship reached orbital velocity and survived reentry heating (a first!). Both vehicles lost before reaching their targeted splashdowns. Payload door opened and closed in space.",
-    video: "https://www.youtube.com/watch?v=bITEj5ACNUQ"
-  },
-  {
-    flight: 4,
-    mission: "IFT-4",
-    dateStr: "Jun 6, 2024",
-    dateSort: new Date("2024-06-06"),
-    site: "Boca Chica, TX",
-    goal: "Controlled splashdown — both vehicles",
-    status: "success",
-    notes: "Full mission success. Super Heavy performed a controlled splashdown in the Gulf of Mexico. Ship survived full reentry and also completed a controlled splashdown — a historic milestone.",
-    video: "https://www.youtube.com/watch?v=61kUs5cIOoE"
-  },
-  {
-    flight: 5,
-    mission: "IFT-5",
-    dateStr: "Oct 13, 2024",
-    dateSort: new Date("2024-10-13"),
-    site: "Boca Chica, TX",
-    goal: "Booster chopstick catch attempt",
-    status: "success",
-    notes: "HISTORIC: Mechazilla (chopstick arms) caught the Super Heavy booster mid-air — the first time a rocket booster of this scale was caught by the launch tower. Ship completed controlled splashdown.",
-    video: "https://www.youtube.com/watch?v=Urd2mjRNKKA"
-  },
-  {
-    flight: 6,
-    mission: "IFT-6",
-    dateStr: "Nov 19, 2024",
-    dateSort: new Date("2024-11-19"),
-    site: "Boca Chica, TX",
-    goal: "Second booster catch, ship reentry",
-    status: "success",
-    notes: "Super Heavy booster caught again by Mechazilla chopstick arms, confirming catch repeatability. Ship performed a controlled splashdown. Flight validated rapid reusability concept.",
-    video: "https://www.youtube.com/watch?v=sjMaHAakaW0"
-  },
-  {
-    flight: 7,
-    mission: "IFT-7",
-    dateStr: "Jan 16, 2025",
-    dateSort: new Date("2025-01-16"),
-    site: "Boca Chica, TX",
-    goal: "Ship reuse & catch readiness test",
-    status: "partial",
-    notes: "Booster catch successful. Ship reentry experienced anomalies; vehicle lost before completing splashdown target. Data gathered on ship thermal protection improvements needed.",
-    video: "https://www.youtube.com/watch?v=VIDEO_IFT7"
-  },
-  {
-    flight: 8,
-    mission: "IFT-8",
-    dateStr: "Feb 28, 2025",
-    dateSort: new Date("2025-02-28"),
-    site: "Boca Chica, TX",
-    goal: "Ship catch attempt (first try)",
-    status: "failure",
-    notes: "Super Heavy booster caught successfully. Ship attempted first-ever catch by tower but was lost during reentry — vehicle broke up before reaching catch zone. Investigation underway.",
-    video: "https://www.youtube.com/watch?v=VIDEO_IFT8"
-  },
-  {
-    flight: 9,
-    mission: "IFT-9",
-    dateStr: "May 27, 2025",
-    dateSort: new Date("2025-05-27"),
-    site: "Boca Chica, TX",
-    goal: "Ship catch retry",
-    status: "success",
-    notes: "Complete success. Both Super Heavy booster and Ship caught by Mechazilla chopstick arms at Starbase — the first time both vehicles were fully recovered in a single flight. Milestone for full reusability.",
-    video: "https://www.youtube.com/watch?v=VIDEO_IFT9"
-  },
-  {
-    flight: 10,
-    mission: "IFT-10",
-    dateStr: "TBD 2025",
-    dateSort: new Date("2025-12-31"),
-    site: "Boca Chica, TX",
-    goal: "Upcoming — details TBD",
-    status: "tbd",
-    notes: "Next integrated flight test. Expected to continue building on full-stack reusability. Date TBD pending FAA license and hardware readiness.",
-    video: null
-  },
-  {
-    flight: 11,
-    mission: "IFT-11",
-    dateStr: "TBD 2025",
-    dateSort: new Date("2025-12-31"),
-    site: "Boca Chica, TX",
-    goal: "Upcoming — details TBD",
-    status: "tbd",
-    notes: "Planned integrated flight test. Details pending IFT-10 outcomes. May include payload demonstration or Starlink satellite deployment test.",
-    video: null
-  },
-  {
-    flight: 12,
-    mission: "Artemis III HLS",
-    dateStr: "TBD 2026",
-    dateSort: new Date("2026-06-01"),
-    site: "Boca Chica, TX",
-    goal: "Lunar lander demonstration (NASA)",
-    status: "upcoming",
-    notes: "Human Landing System for NASA's Artemis III mission — will carry astronauts from lunar orbit to the lunar surface and back. A modified Starship variant (HLS) is under development. Date pending NASA schedule.",
-    video: "https://www.youtube.com/watch?v=7ATtD8x7vV0"
-  }
-];
-
-/* ── STATE ───────────────────────────────────────────────────────── */
-let currentFilter = "all";
-let sortCol       = "flight";
-let sortDir       = 1; // 1 = asc, -1 = desc
-let expandedRows  = new Set();
-
-/* ── STARFIELD ───────────────────────────────────────────────────── */
-(function buildStars() {
-  const sf = document.getElementById("starfield");
-  const count = Math.min(180, Math.floor(window.innerWidth * window.innerHeight / 5000));
-  for (let i = 0; i < count; i++) {
-    const s = document.createElement("div");
-    s.className = "star";
-    const size = Math.random() * 2.5 + 0.5;
-    s.style.cssText = `
-      width:${size}px; height:${size}px;
-      left:${Math.random()*100}%;
-      top:${Math.random()*100}%;
-      --d:${(Math.random()*4+1.5).toFixed(1)}s;
-      --delay:${(Math.random()*5).toFixed(1)}s;
-      --max-op:${(Math.random()*0.7+0.3).toFixed(2)};
-    `;
-    sf.appendChild(s);
-  }
-})();
-
-/* ── STATS ───────────────────────────────────────────────────────── */
-function updateStats() {
-  const all     = LAUNCHES;
-  const success = all.filter(l => l.status === "success").length;
-  const partial = all.filter(l => l.status === "partial").length;
-  const fail    = all.filter(l => l.status === "failure").length;
-  const up      = all.filter(l => l.status === "upcoming" || l.status === "tbd").length;
-  document.getElementById("s-total").textContent   = all.length;
-  document.getElementById("s-success").textContent = success;
-  document.getElementById("s-partial").textContent = partial;
-  document.getElementById("s-fail").textContent    = fail;
-  document.getElementById("s-up").textContent      = up;
-}
-
-/* ── COUNTDOWN ───────────────────────────────────────────────────── */
-function setupCountdown() {
-  const upcoming = LAUNCHES
-    .filter(l => l.status === "upcoming" || l.status === "tbd")
-    .sort((a, b) => a.dateSort - b.dateSort);
-
-  if (!upcoming.length) {
-    document.getElementById("countdown-clock").style.display = "none";
-    document.getElementById("no-upcoming").style.display = "block";
-    return;
-  }
-
-  const next = upcoming[0];
-  document.getElementById("next-mission-name").textContent   = next.mission;
-  document.getElementById("next-mission-detail").textContent = `${next.dateStr} · ${next.site} · ${next.goal}`;
-
-  // If no concrete date, show placeholder
-  const now = Date.now();
-  const diff = next.dateSort.getTime() - now;
-  if (next.dateStr.startsWith("TBD")) {
-    document.getElementById("cd-days").textContent  = "???";
-    document.getElementById("cd-hours").textContent = "??";
-    document.getElementById("cd-mins").textContent  = "??";
-    document.getElementById("cd-secs").textContent  = "??";
-    return;
-  }
-
-  function tick() {
-    const remaining = next.dateSort.getTime() - Date.now();
-    if (remaining <= 0) {
-      document.getElementById("countdown-clock").style.display = "none";
-      document.getElementById("no-upcoming").style.display = "block";
-      document.getElementById("no-upcoming").textContent = "🚀 Launch window active!";
-      return;
-    }
-    const days  = Math.floor(remaining / 86400000);
-    const hours = Math.floor((remaining % 86400000) / 3600000);
-    const mins  = Math.floor((remaining % 3600000)  / 60000);
-    const secs  = Math.floor((remaining % 60000)    / 1000);
-    document.getElementById("cd-days").textContent  = String(days).padStart(3, "0");
-    document.getElementById("cd-hours").textContent = String(hours).padStart(2, "0");
-    document.getElementById("cd-mins").textContent  = String(mins).padStart(2, "0");
-    document.getElementById("cd-secs").textContent  = String(secs).padStart(2, "0");
-  }
-  tick();
-  setInterval(tick, 1000);
-}
-
-/* ── TABLE RENDER ────────────────────────────────────────────────── */
-const FILTER_MAP = {
-  all:       () => true,
-  completed: l => l.status === "success" || l.status === "partial" || l.status === "failure",
-  upcoming:  l => l.status === "upcoming",
-  tbd:       l => l.status === "tbd"
-};
-
-const STATUS_LABEL = {
-  success:  "Success ✓",
-  failure:  "Failure ✗",
-  partial:  "Partial ~",
-  upcoming: "Upcoming",
-  tbd:      "TBD"
-};
-
-function sortLaunches(data) {
-  return [...data].sort((a, b) => {
-    let av, bv;
-    switch (sortCol) {
-      case "flight":  av = a.flight;           bv = b.flight;           break;
-      case "mission": av = a.mission;          bv = b.mission;          break;
-      case "date":    av = a.dateSort;         bv = b.dateSort;         break;
-      case "site":    av = a.site;             bv = b.site;             break;
-      case "goal":    av = a.goal;             bv = b.goal;             break;
-      case "status":  av = a.status;           bv = b.status;           break;
-      default:        av = a.flight;           bv = b.flight;
-    }
-    if (av < bv) return -1 * sortDir;
-    if (av > bv) return  1 * sortDir;
-    return 0;
+function filter(type, btn) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const rows = document.querySelectorAll('#launchTable tbody tr');
+  rows.forEach(row => {
+    const s = row.dataset.status;
+    const t = row.dataset.type;
+    let show = false;
+    if (type === 'all') show = true;
+    else if (type === 'completed') show = t === 'completed';
+    else if (type === 'upcoming') show = t === 'upcoming';
+    else if (type === 'success') show = s === 'success';
+    else if (type === 'partial') show = s === 'partial';
+    else if (type === 'failure') show = s === 'failure';
+    row.classList.toggle('hidden', !show);
   });
 }
-
-function renderTable() {
-  const tbody  = document.getElementById("tbody");
-  const empty  = document.getElementById("empty");
-  const filter = FILTER_MAP[currentFilter];
-  const visible = sortLaunches(LAUNCHES.filter(filter));
-
-  tbody.innerHTML = "";
-
-  if (!visible.length) {
-    empty.style.display = "block";
-    document.getElementById("table-wrap").querySelector("table").style.display = "none";
-    return;
-  }
-  empty.style.display = "none";
-  document.getElementById("table-wrap").querySelector("table").style.display = "";
-
-  visible.forEach(l => {
-    const isExpanded = expandedRows.has(l.flight);
-
-    // Main row
-    const tr = document.createElement("tr");
-    if (isExpanded) tr.classList.add("expanded");
-    tr.dataset.flight = l.flight;
-    tr.innerHTML = `
-      <td class="flight-num">${l.mission}</td>
-      <td class="mission">${l.mission === "Artemis III HLS" ? "Artemis III HLS" : "IFT-" + l.flight}</td>
-      <td>${l.dateStr}</td>
-      <td>${l.site}</td>
-      <td>${l.goal}</td>
-      <td><span class="badge badge-${l.status}">${STATUS_LABEL[l.status]}</span></td>
-      <td><span class="chevron">${isExpanded ? "▼" : "▶"}</span></td>
-    `;
-    // Fix mission name column (flight # col shows IFT label)
-    tr.querySelector("td.flight-num").textContent = l.mission;
-    tr.querySelector("td.mission").textContent    = l.mission;
-    tbody.appendChild(tr);
-
-    // Expand row
-    const expTr = document.createElement("tr");
-    expTr.className = "expand-row";
-    expTr.dataset.flight = l.flight;
-    const videoHtml = l.video && !l.video.includes("VIDEO_")
-      ? `<a class="video-link" href="${l.video}" target="_blank" rel="noopener">▶ Watch on YouTube</a>`
-      : `<span style="color:var(--muted);font-size:0.85rem;">Video link coming soon</span>`;
-
-    expTr.innerHTML = `
-      <td colspan="7">
-        <div class="expand-content${isExpanded ? " open" : ""}">
-          <h3>📋 ${l.mission} — Mission Details</h3>
-          <div class="expand-grid">
-            <div class="expand-field">
-              <label>Launch Date</label>
-              <p>${l.dateStr}</p>
-            </div>
-            <div class="expand-field">
-              <label>Launch Site</label>
-              <p>${l.site}</p>
-            </div>
-            <div class="expand-field">
-              <label>Primary Goal</label>
-              <p>${l.goal}</p>
-            </div>
-            <div class="expand-field">
-              <label>Outcome</label>
-              <p><span class="badge badge-${l.status}">${STATUS_LABEL[l.status]}</span></p>
-            </div>
-          </div>
-          <div class="expand-field" style="margin-bottom:1rem;">
-            <label>Mission Notes</label>
-            <p>${l.notes}</p>
-          </div>
-          ${videoHtml}
-        </div>
-      </td>
-    `;
-    tbody.appendChild(expTr);
-
-    // Click to expand
-    tr.addEventListener("click", () => {
-      if (expandedRows.has(l.flight)) {
-        expandedRows.delete(l.flight);
-      } else {
-        expandedRows.add(l.flight);
-      }
-      renderTable();
-    });
-  });
-
-  // Fix the first column — it was showing mission twice; let's rebuild cleanly
-  // (already fixed via textContent above)
-}
-
-/* ── SORT HEADERS ────────────────────────────────────────────────── */
-document.querySelectorAll("thead th[data-col]").forEach(th => {
-  th.addEventListener("click", () => {
-    const col = th.dataset.col;
-    if (sortCol === col) {
-      sortDir *= -1;
-    } else {
-      sortCol = col;
-      sortDir = 1;
-    }
-    document.querySelectorAll("thead th").forEach(h => {
-      h.classList.remove("sorted");
-      const icon = h.querySelector(".sort-icon");
-      if (icon) icon.textContent = "↕";
-    });
-    th.classList.add("sorted");
-    const icon = th.querySelector(".sort-icon");
-    if (icon) icon.textContent = sortDir === 1 ? "▲" : "▼";
-    renderTable();
-  });
-});
-
-/* ── FILTER BUTTONS ──────────────────────────────────────────────── */
-document.querySelectorAll(".filter-btn").forEach(btn => {
-  btn.addEventListener("click", () => {
-    document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
-    btn.classList.add("active");
-    currentFilter = btn.dataset.filter;
-    expandedRows.clear();
-    renderTable();
-  });
-});
-
-/* ── INIT ────────────────────────────────────────────────────────── */
-updateStats();
-setupCountdown();
-renderTable();
 </script>
 </body>
 </html>
