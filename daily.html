@@ -6,467 +6,877 @@
 <title>Daily Dashboard — Nico</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
   :root {
-    --bg-deep: #060810;
-    --bg-navy: #0a0e1a;
-    --surface: #0d1526;
-    --surface2: #111d35;
-    --border: rgba(64,120,220,0.18);
-    --border-glow: rgba(64,170,255,0.35);
-    --accent: #40aaff;
-    --accent2: #7b4fff;
-    --accent3: #00e5ff;
-    --green: #00e676;
-    --yellow: #ffd740;
-    --red: #ff5252;
-    --orange: #ff9100;
-    --blue: #40c4ff;
-    --text: #e0eeff;
-    --muted: #5a7fa8;
-    --subtle: #8ab4d4;
+    --sidebar-w: 220px;
+    --header-h: 60px;
+    --bg: #f4f5f7;
+    --surface: #ffffff;
+    --border: #e5e7eb;
+    --text: #111827;
+    --muted: #6b7280;
+    --subtle: #9ca3af;
+    --accent: #6366f1;
+    --accent-light: #eef2ff;
+    --teal: #14b8a6;
+    --teal-light: #f0fdfa;
+    --green: #22c55e;
+    --green-light: #f0fdf4;
+    --red: #ef4444;
+    --red-light: #fef2f2;
+    --orange: #f97316;
+    --shadow: 0 1px 3px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.05);
+    --shadow-md: 0 4px 6px rgba(0,0,0,0.05), 0 2px 4px rgba(0,0,0,0.04);
   }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+
   body {
-    background: var(--bg-deep);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg);
     color: var(--text);
-    font-family: 'Inter', system-ui, sans-serif;
     min-height: 100vh;
-    overflow-x: hidden;
-    background-image:
-      radial-gradient(ellipse 80% 60% at 10% 20%, rgba(123,79,255,0.07) 0%, transparent 60%),
-      radial-gradient(ellipse 60% 50% at 90% 10%, rgba(0,180,255,0.06) 0%, transparent 55%),
-      radial-gradient(ellipse 50% 40% at 50% 80%, rgba(64,170,255,0.04) 0%, transparent 50%);
+    display: flex;
   }
 
-  /* STARFIELD */
-  #starfield { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
-  .star {
-    position: absolute; border-radius: 50%; background: #fff;
-    animation: twinkle var(--dur, 4s) ease-in-out infinite var(--delay, 0s);
-  }
-  @keyframes twinkle {
-    0%, 100% { opacity: var(--min-op, 0.2); transform: scale(1); }
-    50% { opacity: var(--max-op, 0.9); transform: scale(1.4); }
+  /* ── SIDEBAR ── */
+  .sidebar {
+    width: var(--sidebar-w);
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0; left: 0; bottom: 0;
+    z-index: 200;
+    padding: 0 0 16px;
   }
 
-  /* NAV */
-  .nav {
-    position: sticky; top: 0; z-index: 100;
-    background: rgba(6,8,16,0.85); backdrop-filter: blur(16px);
+  .sidebar-logo {
+    display: flex; align-items: center; gap: 10px;
+    padding: 18px 20px;
     border-bottom: 1px solid var(--border);
-    padding: 0 24px;
+    font-size: 1.1rem; font-weight: 700;
+    color: var(--accent);
   }
-  .nav-inner {
-    max-width: 1300px; margin: 0 auto;
-    display: flex; align-items: center; gap: 8px;
-    height: 52px;
-  }
-  .nav-brand {
-    font-family: 'Orbitron', monospace; font-size: 0.65rem;
-    letter-spacing: 4px; color: var(--accent); opacity: 0.7;
-    margin-right: auto;
-  }
-  .nav-link {
-    color: var(--subtle); text-decoration: none; font-size: 0.82rem;
-    font-weight: 500; padding: 6px 14px; border-radius: 6px;
-    transition: all 0.2s; border: 1px solid transparent;
-  }
-  .nav-link:hover { color: var(--text); background: var(--surface2); border-color: var(--border); }
-  .nav-link.active {
-    color: var(--accent); background: rgba(64,170,255,0.08);
-    border-color: rgba(64,170,255,0.25);
-  }
-  .nav-sep { color: var(--muted); font-size: 0.75rem; }
+  .sidebar-logo svg { flex-shrink: 0; }
 
-  /* LAYOUT */
-  .page { position: relative; z-index: 1; max-width: 1300px; margin: 0 auto; padding: 0 20px 80px; }
-
-  /* HERO */
-  .hero-header { text-align: center; padding: 56px 20px 44px; position: relative; }
-  .hero-header::after {
-    content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
-    width: 60%; height: 1px; background: linear-gradient(90deg, transparent, var(--border-glow), transparent);
+  .sidebar-section-label {
+    font-size: 0.68rem; font-weight: 600; letter-spacing: 0.07em;
+    text-transform: uppercase; color: var(--subtle);
+    padding: 20px 20px 6px;
   }
-  .hero-eyebrow { font-family: 'Orbitron', monospace; font-size: 0.65rem; letter-spacing: 6px; text-transform: uppercase; color: var(--accent); margin-bottom: 16px; opacity: 0.8; }
-  .hero-title {
-    font-family: 'Orbitron', monospace; font-size: clamp(2rem, 6vw, 4rem);
-    font-weight: 900; letter-spacing: -1px; line-height: 1;
-    background: linear-gradient(135deg, #fff 0%, var(--accent3) 40%, var(--accent2) 80%, var(--accent) 100%);
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-    filter: drop-shadow(0 0 40px rgba(64,170,255,0.3)); margin-bottom: 10px;
-  }
-  .hero-date { font-size: 0.88rem; color: var(--muted); letter-spacing: 1px; margin-top: 8px; }
 
-  /* SECTION */
-  .section { margin-top: 48px; }
-  .section-title {
-    font-family: 'Orbitron', monospace; font-size: 0.7rem;
-    letter-spacing: 5px; text-transform: uppercase;
-    color: var(--accent); opacity: 0.75; margin-bottom: 20px;
+  .sidebar-link {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 20px;
+    color: var(--muted); font-size: 0.875rem; font-weight: 500;
+    text-decoration: none; border-radius: 0;
+    transition: background 0.15s, color 0.15s;
+    position: relative;
+  }
+  .sidebar-link:hover { background: var(--bg); color: var(--text); }
+  .sidebar-link.active {
+    background: var(--accent-light); color: var(--accent); font-weight: 600;
+  }
+  .sidebar-link.active::before {
+    content: ''; position: absolute; left: 0; top: 4px; bottom: 4px;
+    width: 3px; background: var(--accent); border-radius: 0 2px 2px 0;
+  }
+  .sidebar-link svg { opacity: 0.65; flex-shrink: 0; }
+  .sidebar-link.active svg { opacity: 1; }
+
+  .badge {
+    margin-left: auto; background: var(--accent); color: #fff;
+    font-size: 0.7rem; font-weight: 600; border-radius: 999px;
+    padding: 1px 7px; min-width: 20px; text-align: center;
+  }
+  .badge.teal { background: var(--teal); }
+
+  .sidebar-footer {
+    margin-top: auto; padding: 16px 20px;
+    border-top: 1px solid var(--border);
     display: flex; align-items: center; gap: 10px;
   }
-  .section-title::after {
-    content: ''; flex: 1; height: 1px;
-    background: linear-gradient(90deg, var(--border-glow), transparent);
+  .avatar {
+    width: 34px; height: 34px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent) 0%, var(--teal) 100%);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.8rem; font-weight: 700; color: #fff; flex-shrink: 0;
+  }
+  .sidebar-user-name { font-size: 0.82rem; font-weight: 600; color: var(--text); }
+  .sidebar-user-role { font-size: 0.72rem; color: var(--muted); }
+  .sidebar-upgrade {
+    margin: 0 12px 4px;
+    background: var(--accent-light); color: var(--accent);
+    border: none; border-radius: 8px; padding: 9px;
+    font-size: 0.8rem; font-weight: 600; cursor: pointer;
+    width: calc(100% - 24px); text-align: center;
+    transition: background 0.15s;
+  }
+  .sidebar-upgrade:hover { background: #e0e7ff; }
+
+  /* ── MAIN ── */
+  .main {
+    margin-left: var(--sidebar-w);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
   }
 
-  /* CARD BASE */
-  .card {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 14px; padding: 20px 22px;
-    transition: border-color 0.2s, box-shadow 0.2s;
+  /* ── TOP HEADER ── */
+  .topbar {
+    height: var(--header-h);
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center;
+    padding: 0 28px;
+    gap: 12px;
+    position: sticky; top: 0; z-index: 100;
+    box-shadow: var(--shadow);
   }
-  .card:hover { border-color: var(--border-glow); box-shadow: 0 4px 32px rgba(64,170,255,0.08); }
+  .page-title { font-size: 1.15rem; font-weight: 700; color: var(--text); margin-right: auto; }
+  .date-badge {
+    display: flex; align-items: center; gap: 6px;
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: 8px; padding: 6px 12px;
+    font-size: 0.82rem; color: var(--muted); font-weight: 500;
+  }
+  .topbar-btn {
+    width: 36px; height: 36px; border-radius: 8px;
+    border: 1px solid var(--border); background: var(--bg);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; color: var(--muted); transition: background 0.15s;
+  }
+  .topbar-btn:hover { background: #e5e7eb; color: var(--text); }
+  .topbar-avatar {
+    width: 34px; height: 34px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent) 0%, var(--teal) 100%);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.8rem; font-weight: 700; color: #fff; cursor: pointer;
+  }
 
-  /* WEATHER */
-  .weather-grid {
+  /* ── CONTENT ── */
+  .content { padding: 28px; flex: 1; }
+
+  /* ── STAT CARDS ── */
+  .stat-row {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     gap: 16px;
+    margin-bottom: 24px;
   }
-  @media (max-width: 700px) {
-    .weather-grid { grid-template-columns: 1fr; }
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 22px;
+    box-shadow: var(--shadow);
+    transition: box-shadow 0.2s;
   }
-  .weather-main { grid-column: 1; }
-  .weather-card { display: flex; flex-direction: column; gap: 8px; }
-  .weather-loc { font-size: 0.75rem; color: var(--muted); font-weight: 500; letter-spacing: 0.5px; }
-  .weather-temp {
-    font-family: 'Orbitron', monospace; font-size: 2.6rem;
-    font-weight: 700; color: var(--text); line-height: 1;
+  .stat-card:hover { box-shadow: var(--shadow-md); }
+  .stat-card-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 12px;
   }
-  .weather-temp.small { font-size: 1.8rem; }
-  .weather-cond { font-size: 0.9rem; color: var(--subtle); margin-top: 2px; }
-  .weather-wind { font-size: 0.78rem; color: var(--muted); }
-  .weather-trip-badge {
-    display: inline-block; font-size: 0.65rem; font-weight: 600;
-    letter-spacing: 1.5px; text-transform: uppercase;
-    background: rgba(64,170,255,0.12); color: var(--accent);
-    border: 1px solid rgba(64,170,255,0.25); border-radius: 4px;
-    padding: 2px 8px; margin-bottom: 6px;
+  .stat-label {
+    font-size: 0.8rem; font-weight: 500; color: var(--muted);
+    display: flex; align-items: center; gap: 6px;
   }
-  .weather-loading { color: var(--muted); font-size: 0.85rem; }
+  .stat-icon {
+    width: 28px; height: 28px; border-radius: 7px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.9rem;
+  }
+  .stat-icon.purple { background: var(--accent-light); }
+  .stat-icon.teal { background: var(--teal-light); }
+  .stat-icon.orange { background: #fff7ed; }
+  .stat-value {
+    font-size: 2rem; font-weight: 700; color: var(--text);
+    line-height: 1.1; margin-bottom: 6px;
+  }
+  .stat-value.small { font-size: 1.4rem; }
+  .change-badge {
+    display: inline-flex; align-items: center; gap: 3px;
+    font-size: 0.75rem; font-weight: 600; border-radius: 999px;
+    padding: 2px 8px;
+  }
+  .change-badge.up { background: var(--green-light); color: #16a34a; }
+  .change-badge.down { background: var(--red-light); color: var(--red); }
+  .change-badge.neutral { background: var(--bg); color: var(--muted); }
+  .stat-sub { font-size: 0.78rem; color: var(--muted); margin-top: 4px; }
 
-  /* EMAIL CARDS */
-  .email-list { display: flex; flex-direction: column; gap: 12px; }
+  /* ── GRID PANELS ── */
+  .panels-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 24px;
+  }
+  @media (max-width: 900px) { .panels-grid { grid-template-columns: 1fr; } }
+
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+  .panel.full-width { grid-column: 1 / -1; }
+
+  .panel-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  .panel-title {
+    font-size: 0.9rem; font-weight: 600; color: var(--text);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .panel-actions { display: flex; gap: 8px; }
+  .panel-btn {
+    display: flex; align-items: center; gap: 5px;
+    padding: 5px 10px; border-radius: 6px;
+    border: 1px solid var(--border); background: var(--bg);
+    font-size: 0.75rem; font-weight: 500; color: var(--muted);
+    cursor: pointer; transition: background 0.15s;
+    text-decoration: none;
+  }
+  .panel-btn:hover { background: #e5e7eb; color: var(--text); }
+  .panel-body { padding: 16px 20px; }
+
+  /* ── EMAIL CARDS ── */
   .email-card {
-    display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;
-    cursor: pointer; text-decoration: none; color: inherit;
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
   }
-  .email-card:hover .email-subject { color: var(--accent); }
-  .email-body { flex: 1; }
-  .email-subject { font-size: 0.9rem; font-weight: 600; color: var(--text); margin-bottom: 4px; transition: color 0.2s; }
-  .email-summary { font-size: 0.8rem; color: var(--muted); line-height: 1.4; }
-  .email-icon { font-size: 1rem; color: var(--muted); flex-shrink: 0; margin-top: 2px; opacity: 0.6; transition: opacity 0.2s; }
-  .email-card:hover .email-icon { opacity: 1; color: var(--accent); }
+  .email-card:last-child { border-bottom: none; }
+  .email-avatar {
+    width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.85rem; font-weight: 700; color: #fff;
+  }
+  .email-sender { font-size: 0.82rem; font-weight: 600; color: var(--text); }
+  .email-subject { font-size: 0.82rem; color: var(--muted); margin-bottom: 3px; }
+  .email-why { font-size: 0.78rem; color: var(--subtle); font-style: italic; }
+  .email-link {
+    margin-left: auto; flex-shrink: 0;
+    color: var(--accent); font-size: 0.75rem; font-weight: 500;
+    text-decoration: none; padding: 4px 8px; border-radius: 6px;
+    border: 1px solid var(--accent-light); background: var(--accent-light);
+    transition: background 0.15s;
+  }
+  .email-link:hover { background: #e0e7ff; }
 
-  /* PROJECTS GRID */
-  .projects-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 16px;
-  }
-  .proj-card { display: flex; flex-direction: column; gap: 10px; }
-  .proj-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
-  .proj-name { font-size: 0.95rem; font-weight: 700; color: var(--text); }
-  .badge {
-    font-size: 0.6rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
-    padding: 3px 8px; border-radius: 4px; white-space: nowrap;
-  }
-  .badge-live { background: rgba(0,230,118,0.12); color: var(--green); border: 1px solid rgba(0,230,118,0.3); }
-  .badge-active { background: rgba(64,170,255,0.12); color: var(--accent); border: 1px solid rgba(64,170,255,0.3); }
-  .badge-ongoing { background: rgba(123,79,255,0.12); color: var(--accent2); border: 1px solid rgba(123,79,255,0.3); }
-  .proj-desc { font-size: 0.8rem; color: var(--muted); line-height: 1.5; flex: 1; }
-  .proj-btn {
-    display: inline-flex; align-items: center; gap: 6px;
-    font-size: 0.78rem; font-weight: 600; text-decoration: none;
-    color: var(--accent); background: rgba(64,170,255,0.08);
-    border: 1px solid rgba(64,170,255,0.25); border-radius: 7px;
-    padding: 7px 14px; transition: all 0.2s; align-self: flex-start;
-  }
-  .proj-btn:hover { background: rgba(64,170,255,0.18); border-color: rgba(64,170,255,0.5); }
-
-  /* THREADS */
-  .threads-list { display: flex; flex-direction: column; gap: 12px; }
+  /* ── THREAD CARDS ── */
   .thread-card {
-    display: flex; align-items: flex-start; justify-content: space-between;
-    gap: 12px; text-decoration: none; color: inherit;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
   }
-  .thread-card:hover .thread-subject { color: var(--accent3); }
-  .thread-body { flex: 1; }
-  .thread-subject { font-size: 0.88rem; font-weight: 600; color: var(--text); margin-bottom: 3px; transition: color 0.2s; }
-  .thread-participants { font-size: 0.72rem; color: var(--accent); margin-bottom: 4px; }
-  .thread-summary { font-size: 0.78rem; color: var(--muted); line-height: 1.4; }
-  .thread-icon { font-size: 1rem; color: var(--muted); flex-shrink: 0; margin-top: 2px; opacity: 0.6; transition: opacity 0.2s; }
-  .thread-card:hover .thread-icon { opacity: 1; color: var(--accent3); }
+  .thread-card:last-child { border-bottom: none; }
+  .thread-header {
+    display: flex; align-items: center; gap: 8px; margin-bottom: 6px;
+  }
+  .thread-project {
+    font-size: 0.8rem; font-weight: 700; color: var(--text);
+  }
+  .source-badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 0.68rem; font-weight: 600; border-radius: 999px;
+    padding: 2px 8px; text-transform: uppercase; letter-spacing: 0.04em;
+  }
+  .source-badge.slack { background: #fef3c7; color: #92400e; }
+  .source-badge.imessage { background: var(--teal-light); color: #0f766e; }
+  .source-badge.gmail { background: var(--red-light); color: var(--red); }
+  .thread-summary { font-size: 0.8rem; color: var(--muted); line-height: 1.5; }
+  .thread-meta { font-size: 0.72rem; color: var(--subtle); margin-top: 4px; }
 
-  /* FOOTER */
-  .footer {
-    text-align: center; margin-top: 64px; padding-top: 24px;
-    border-top: 1px solid var(--border);
-    font-size: 0.75rem; color: var(--muted);
-    position: relative; z-index: 1;
+  /* ── WEATHER CARDS ── */
+  .weather-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 14px;
+    padding: 16px 20px;
   }
-  .footer span { display: block; margin-top: 4px; opacity: 0.5; }
+  .weather-card {
+    border-radius: 10px; padding: 14px 16px;
+    border: 1px solid var(--border);
+    background: linear-gradient(135deg, var(--accent-light) 0%, #fff 100%);
+    position: relative; overflow: hidden;
+  }
+  .weather-card.travel {
+    background: linear-gradient(135deg, var(--teal-light) 0%, #fff 100%);
+  }
+  .weather-location { font-size: 0.75rem; font-weight: 600; color: var(--muted); margin-bottom: 2px; }
+  .weather-temp {
+    font-size: 1.8rem; font-weight: 700; color: var(--text);
+    line-height: 1.1;
+  }
+  .weather-desc { font-size: 0.78rem; color: var(--muted); margin-top: 2px; }
+  .weather-icon { font-size: 2rem; position: absolute; right: 12px; top: 12px; }
+  .weather-loading { font-size: 0.82rem; color: var(--subtle); padding: 4px 0; }
 
-  @media (max-width: 600px) {
-    .hero-title { font-size: 1.8rem; }
-    .weather-temp { font-size: 2rem; }
+  /* ── QUICK LINKS ── */
+  .quick-links {
+    display: flex; flex-wrap: wrap; gap: 12px;
+    padding: 16px 20px;
   }
+  .quick-link {
+    display: flex; align-items: center; gap: 8px;
+    padding: 10px 16px; border-radius: 9px;
+    border: 1px solid var(--border); background: var(--surface);
+    color: var(--text); font-size: 0.82rem; font-weight: 500;
+    text-decoration: none; transition: all 0.15s; box-shadow: var(--shadow);
+  }
+  .quick-link:hover {
+    border-color: var(--accent); color: var(--accent);
+    background: var(--accent-light); box-shadow: var(--shadow-md);
+  }
+  .quick-link-icon { font-size: 1.1rem; }
+
+  /* ── INTEGRATION TABLE ── */
+  .int-table { width: 100%; border-collapse: collapse; }
+  .int-table th {
+    font-size: 0.7rem; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.05em; color: var(--subtle);
+    padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--border);
+  }
+  .int-table td { padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+  .int-table tr:last-child td { border-bottom: none; }
+  .int-table tr:hover td { background: var(--bg); }
+  .int-app { display: flex; align-items: center; gap: 8px; }
+  .int-app-icon {
+    width: 28px; height: 28px; border-radius: 6px;
+    display: flex; align-items: center; justify-content: center; font-size: 0.85rem;
+    flex-shrink: 0;
+  }
+  .int-app-name { font-size: 0.82rem; font-weight: 500; color: var(--text); }
+  .int-type { font-size: 0.78rem; color: var(--muted); }
+  .progress-bar {
+    height: 4px; border-radius: 999px; background: var(--border); overflow: hidden;
+    width: 80px; display: inline-block;
+  }
+  .progress-fill { height: 100%; border-radius: 999px; }
+  .fill-accent { background: var(--accent); }
+  .fill-teal { background: var(--teal); }
+  .fill-orange { background: var(--orange); }
+  .int-profit { font-size: 0.82rem; font-weight: 600; color: var(--text); }
+
+  .see-all { font-size: 0.78rem; color: var(--accent); font-weight: 500; text-decoration: none; }
+  .see-all:hover { text-decoration: underline; }
+
+  /* ── SPINNER ── */
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .spin { animation: spin 1s linear infinite; display: inline-block; }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 999px; }
 </style>
 </head>
 <body>
 
-<div id="starfield"></div>
-
-<!-- NAV -->
-<nav class="nav">
-  <div class="nav-inner">
-    <div class="nav-brand">MISSION CONTROL</div>
-    <a href="daily.html" class="nav-link active">Daily Dashboard</a>
-    <span class="nav-sep">|</span>
-    <a href="index.html" class="nav-link">Starship Tracker</a>
-  </div>
-</nav>
-
-<div class="page">
-  <!-- HERO -->
-  <div class="hero-header">
-    <div class="hero-eyebrow">Personal HQ</div>
-    <div class="hero-title">Daily Dashboard</div>
-    <div class="hero-date" id="hero-date"></div>
+<!-- ══ SIDEBAR ══ -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+      <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    Nico·OS
   </div>
 
-  <!-- WEATHER -->
-  <div class="section">
-    <div class="section-title">🌤️ Weather</div>
-    <div class="weather-grid">
-      <!-- Main: Outer Sunset SF -->
-      <div class="card weather-card weather-main">
-        <div class="weather-loc">📍 Outer Sunset, San Francisco, CA</div>
-        <div class="weather-temp" id="sf-temp"><span class="weather-loading">Loading…</span></div>
-        <div class="weather-cond" id="sf-cond"></div>
-        <div class="weather-wind" id="sf-wind"></div>
-      </div>
-      <!-- Trip: Whistler -->
-      <div class="card weather-card">
-        <div class="weather-trip-badge">✈️ Upcoming Trip</div>
-        <div class="weather-loc">🏔️ Whistler, BC &nbsp;·&nbsp; Sep 5, 2026</div>
-        <div class="weather-temp small" id="wh-temp"><span class="weather-loading">Loading…</span></div>
-        <div class="weather-cond" id="wh-cond"></div>
-        <div class="weather-wind" id="wh-wind"></div>
-      </div>
-      <!-- Trip: Moab -->
-      <div class="card weather-card">
-        <div class="weather-trip-badge">✈️ Upcoming Trip</div>
-        <div class="weather-loc">🏜️ Moab, Utah &nbsp;·&nbsp; Sep 23, 2026</div>
-        <div class="weather-temp small" id="mo-temp"><span class="weather-loading">Loading…</span></div>
-        <div class="weather-cond" id="mo-cond"></div>
-        <div class="weather-wind" id="mo-wind"></div>
-      </div>
+  <div class="sidebar-section-label">General</div>
+  <a href="daily.html" class="sidebar-link active">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+      <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+    </svg>
+    Dashboard
+  </a>
+  <a href="index.html" class="sidebar-link">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+    </svg>
+    Starship Tracker
+  </a>
+
+  <div class="sidebar-section-label">Projects</div>
+  <a href="#email" class="sidebar-link" onclick="smoothTo('email')">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>
+    </svg>
+    Email Highlights
+    <span class="badge" id="email-badge">—</span>
+  </a>
+  <a href="#threads" class="sidebar-link" onclick="smoothTo('threads')">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
+    </svg>
+    Project Threads
+    <span class="badge teal" id="thread-badge">—</span>
+  </a>
+  <a href="#weather" class="sidebar-link" onclick="smoothTo('weather')">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M17.5 19H9a7 7 0 110-14 7 7 0 010 14"/><path d="M17.5 19a2.5 2.5 0 100-5H9"/>
+    </svg>
+    Weather
+  </a>
+
+  <div class="sidebar-section-label">Support</div>
+  <a href="#" class="sidebar-link">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41M21 12h-2M17.66 17.66l-1.41-1.41M12 21v-2M7.76 17.66L6.34 19.07M3 12H1m3.93-7.07L6.34 6.34"/>
+    </svg>
+    Settings
+  </a>
+  <a href="#" class="sidebar-link">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3M12 17h.01"/>
+    </svg>
+    Help
+  </a>
+
+  <div style="flex:1"></div>
+  <button class="sidebar-upgrade" onclick="window.open('index.html')">🚀 Open Starship Tracker</button>
+
+  <div class="sidebar-footer">
+    <div class="avatar">NJ</div>
+    <div>
+      <div class="sidebar-user-name">Nico Johnson</div>
+      <div class="sidebar-user-role">Zesty Labs · SF</div>
     </div>
   </div>
+</aside>
 
-  <!-- EMAIL HIGHLIGHTS -->
-  <div class="section">
-    <div class="section-title">📬 Email Highlights</div>
-    <div class="email-list">
+<!-- ══ MAIN ══ -->
+<div class="main">
 
-      <a class="card email-card" href="https://mail.google.com/mail/u/0/#search/from:f.inc+is:unread" target="_blank" rel="noopener">
-        <div class="email-body">
-          <div class="email-subject">Blueprint by Founders Inc</div>
-          <div class="email-summary">$150K investment program — deadline Sep 14. Worth a look for Zesty Labs.</div>
-        </div>
-        <div class="email-icon">↗</div>
-      </a>
-
-      <a class="card email-card" href="https://mail.google.com/mail/u/0/#search/from:mercury.com+is:unread" target="_blank" rel="noopener">
-        <div class="email-body">
-          <div class="email-subject">Mercury: Electric Air payment</div>
-          <div class="email-summary">$2,430 ACH received Sep 2 — confirm it cleared.</div>
-        </div>
-        <div class="email-icon">↗</div>
-      </a>
-
-      <a class="card email-card" href="https://mail.google.com/mail/u/0/#all/1a04a6786497ee31" target="_blank" rel="noopener">
-        <div class="email-body">
-          <div class="email-subject">Energy GPS — IOI from Sandalwood West</div>
-          <div class="email-summary">Indication of Interest doc shared — key deal milestone.</div>
-        </div>
-        <div class="email-icon">↗</div>
-      </a>
-
-      <a class="card email-card" href="https://mail.google.com/mail/u/0/#all/1a05e4b2aafc6ea5" target="_blank" rel="noopener">
-        <div class="email-body">
-          <div class="email-subject">Energy GPS — Supplemental Materials</div>
-          <div class="email-summary">Updated deal materials from Sandalwood West.</div>
-        </div>
-        <div class="email-icon">↗</div>
-      </a>
-
-      <a class="card email-card" href="https://mail.google.com/mail/u/0/#all/1a05ef10308b4174" target="_blank" rel="noopener">
-        <div class="email-body">
-          <div class="email-subject">Zesty Labs cash flow digest</div>
-          <div class="email-summary">August financial snapshot — review vs payroll/invoices.</div>
-        </div>
-        <div class="email-icon">↗</div>
-      </a>
-
+  <!-- TOP BAR -->
+  <header class="topbar">
+    <span class="page-title">Dashboard</span>
+    <div class="date-badge">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+      </svg>
+      <span id="today-date">—</span>
+      <span style="color:var(--border)">|</span>
+      <span id="today-time">—</span>
     </div>
-  </div>
+    <button class="topbar-btn" title="Filter">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
+      </svg>
+    </button>
+    <button class="topbar-btn" title="Export">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+      </svg>
+    </button>
+    <button class="topbar-btn" title="Notifications">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/>
+      </svg>
+    </button>
+    <div class="topbar-avatar" title="Nico Johnson">NJ</div>
+  </header>
 
-  <!-- ACTIVE PROJECTS -->
-  <div class="section">
-    <div class="section-title">🗂️ Active Projects</div>
-    <div class="projects-grid">
+  <!-- CONTENT -->
+  <main class="content">
 
-      <div class="card proj-card">
-        <div class="proj-header">
-          <div class="proj-name">🚀 Starship Tracker</div>
-          <span class="badge badge-live">LIVE</span>
+    <!-- ── STAT ROW ── -->
+    <div class="stat-row">
+
+      <!-- Weather SF -->
+      <div class="stat-card">
+        <div class="stat-card-header">
+          <span class="stat-label">
+            <div class="stat-icon purple">🌤</div>
+            Outer Sunset, SF
+          </span>
+          <span class="change-badge neutral" id="sf-feels">Fetching…</span>
         </div>
-        <div class="proj-desc">Tracks all SpaceX Starship IFT flights — upcoming launches, outcomes, and notes.</div>
-        <a class="proj-btn" href="index.html">Open Tracker →</a>
+        <div class="stat-value" id="sf-temp">—°</div>
+        <div class="stat-sub" id="sf-desc">Loading weather…</div>
       </div>
 
-      <div class="card proj-card">
-        <div class="proj-header">
-          <div class="proj-name">⚡ Energy GPS — Sandalwood West</div>
-          <span class="badge badge-active">ACTIVE DEAL</span>
+      <!-- Unread Emails -->
+      <div class="stat-card">
+        <div class="stat-card-header">
+          <span class="stat-label">
+            <div class="stat-icon purple">📨</div>
+            Unread Emails
+          </span>
+          <span class="change-badge up">↑ Action needed</span>
         </div>
-        <div class="proj-desc">IOI received from Sandalwood West. Riata Capital intro in progress. Deal materials shared.</div>
-        <a class="proj-btn" href="https://mail.google.com/mail/u/0/#search/sandalwood+OR+energy+gps" target="_blank" rel="noopener">View Emails →</a>
+        <div class="stat-value" id="email-count">4</div>
+        <div class="stat-sub">Worth reading today</div>
       </div>
 
-      <div class="card proj-card">
-        <div class="proj-header">
-          <div class="proj-name">🧪 Zesty Labs</div>
-          <span class="badge badge-ongoing">ONGOING</span>
+      <!-- Active Threads -->
+      <div class="stat-card">
+        <div class="stat-card-header">
+          <span class="stat-label">
+            <div class="stat-icon teal">💬</div>
+            Project Threads
+          </span>
+          <span class="change-badge up" style="background:var(--teal-light);color:#0f766e;">Active</span>
         </div>
-        <div class="proj-desc">Invoices, cash flow, and outreach. Electric Air payment just landed. Blueprint $150K app closes Sep 14.</div>
-        <a class="proj-btn" href="https://mail.google.com/mail/u/0/#search/zesty+labs" target="_blank" rel="noopener">View Emails →</a>
+        <div class="stat-value" id="thread-count">3</div>
+        <div class="stat-sub">Across Slack · iMessage · Gmail</div>
       </div>
 
     </div>
-  </div>
 
-  <!-- PROJECT THREADS -->
-  <div class="section">
-    <div class="section-title">💬 Project Threads</div>
-    <div class="threads-list">
+    <!-- ── EMAIL + THREADS PANELS ── -->
+    <div class="panels-grid">
 
-      <a class="card thread-card" href="https://mail.google.com/mail/u/0/#all/1a05ebb2c524b052" target="_blank" rel="noopener">
-        <div class="thread-body">
-          <div class="thread-subject">Re: Zesty Labs LLC sent you a new invoice</div>
-          <div class="thread-participants">Krista Mast (Electric Plant)</div>
-          <div class="thread-summary">Electric Plant confirmed payment — AR item closing.</div>
+      <!-- Email Highlights -->
+      <div class="panel" id="email">
+        <div class="panel-header">
+          <span class="panel-title">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>
+            </svg>
+            Email Highlights
+          </span>
+          <div class="panel-actions">
+            <a href="https://mail.google.com" target="_blank" class="panel-btn">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+              Open Gmail
+            </a>
+          </div>
         </div>
-        <div class="thread-icon">↗</div>
-      </a>
-
-      <a class="card thread-card" href="https://mail.google.com/mail/u/0/#all/1a016ac97a75a654" target="_blank" rel="noopener">
-        <div class="thread-body">
-          <div class="thread-subject">Meeting with Brandon Boyd – Riata Capital Group</div>
-          <div class="thread-participants">Maria at Sandalwood West</div>
-          <div class="thread-summary">Riata Capital intro — potential capital source for Energy GPS.</div>
+        <div class="panel-body" id="email-list">
+          <!-- Populated by JS placeholder data -->
         </div>
-        <div class="thread-icon">↗</div>
-      </a>
+      </div>
 
-      <a class="card thread-card" href="https://mail.google.com/mail/u/0/#all/1a04a6786497ee31" target="_blank" rel="noopener">
-        <div class="thread-body">
-          <div class="thread-subject">SWW IOI - Energy GPS</div>
-          <div class="thread-participants">Sandalwood West LLC</div>
-          <div class="thread-summary">Formal IOI document — transaction milestone preceding offer.</div>
+      <!-- Project Threads -->
+      <div class="panel" id="threads">
+        <div class="panel-header">
+          <span class="panel-title">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--teal)" stroke-width="2">
+              <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
+            </svg>
+            Project Threads
+          </span>
+          <div class="panel-actions">
+            <span class="panel-btn">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+              Filter
+            </span>
+            <span class="panel-btn">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+              Sort
+            </span>
+          </div>
         </div>
-        <div class="thread-icon">↗</div>
-      </a>
+        <div class="panel-body" id="thread-list">
+          <!-- Populated by JS -->
+        </div>
+      </div>
 
     </div>
-  </div>
 
-</div><!-- /page -->
+    <!-- ── WEATHER PANEL (full width) ── -->
+    <div class="panel full-width" id="weather" style="margin-bottom:24px;">
+      <div class="panel-header">
+        <span class="panel-title">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="2">
+            <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+          </svg>
+          Travel Weather
+        </span>
+        <span style="font-size:0.75rem;color:var(--muted);">Upcoming trips</span>
+      </div>
+      <div class="weather-row" id="weather-cards">
+        <div class="weather-loading spin">⟳</div>
+      </div>
+    </div>
 
-<!-- FOOTER -->
-<footer class="footer">
-  <div id="footer-ts">Last updated: —</div>
-  <span>Built with Boop 🤖</span>
-</footer>
+    <!-- ── BOTTOM GRID: Quick Links + Integrations ── -->
+    <div class="panels-grid">
+
+      <!-- Quick Links -->
+      <div class="panel">
+        <div class="panel-header">
+          <span class="panel-title">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2">
+              <path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/>
+            </svg>
+            Quick Links
+          </span>
+        </div>
+        <div class="quick-links">
+          <a href="index.html" class="quick-link">
+            <span class="quick-link-icon">🚀</span>
+            Starship Tracker
+          </a>
+          <a href="https://mail.google.com" target="_blank" class="quick-link">
+            <span class="quick-link-icon">📧</span>
+            Gmail
+          </a>
+          <a href="https://calendar.google.com" target="_blank" class="quick-link">
+            <span class="quick-link-icon">📅</span>
+            Calendar
+          </a>
+          <a href="https://slack.com" target="_blank" class="quick-link">
+            <span class="quick-link-icon">💬</span>
+            Slack
+          </a>
+          <a href="https://www.flightradar24.com" target="_blank" class="quick-link">
+            <span class="quick-link-icon">✈️</span>
+            Flight Tracker
+          </a>
+          <a href="https://www.mountainforecast.com/mountains/Whistler-Mountain/forecasts/summit" target="_blank" class="quick-link">
+            <span class="quick-link-icon">🏔</span>
+            Whistler Forecast
+          </a>
+          <a href="https://www.moabweather.com" target="_blank" class="quick-link">
+            <span class="quick-link-icon">🏜</span>
+            Moab Forecast
+          </a>
+        </div>
+      </div>
+
+      <!-- Integrations -->
+      <div class="panel">
+        <div class="panel-header">
+          <span class="panel-title">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--teal)" stroke-width="2">
+              <circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41M21 12h-2M17.66 17.66l-1.41-1.41M12 21v-2M7.76 17.66L6.34 19.07M3 12H1m3.93-7.07L6.34 6.34"/>
+            </svg>
+            Connected Tools
+          </span>
+          <a href="#" class="see-all">See All</a>
+        </div>
+        <div class="panel-body" style="padding:0 20px;">
+          <table class="int-table">
+            <thead>
+              <tr>
+                <th>Application</th>
+                <th>Type</th>
+                <th>Status</th>
+                <th>Category</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><div class="int-app"><div class="int-app-icon" style="background:#fef3c7;">📬</div><span class="int-app-name">Gmail</span></div></td>
+                <td><span class="int-type">Email</span></td>
+                <td><div class="progress-bar"><div class="progress-fill fill-accent" style="width:90%"></div></div></td>
+                <td><span class="int-profit" style="color:var(--green);">Active</span></td>
+              </tr>
+              <tr>
+                <td><div class="int-app"><div class="int-app-icon" style="background:#fef3c7;">💬</div><span class="int-app-name">Slack</span></div></td>
+                <td><span class="int-type">Messaging</span></td>
+                <td><div class="progress-bar"><div class="progress-fill fill-teal" style="width:75%"></div></div></td>
+                <td><span class="int-profit" style="color:var(--green);">Active</span></td>
+              </tr>
+              <tr>
+                <td><div class="int-app"><div class="int-app-icon" style="background:#f0fdf4;">🌤</div><span class="int-app-name">Open-Meteo</span></div></td>
+                <td><span class="int-type">Weather</span></td>
+                <td><div class="progress-bar"><div class="progress-fill fill-orange" style="width:100%"></div></div></td>
+                <td><span class="int-profit" style="color:var(--green);">Live</span></td>
+              </tr>
+              <tr>
+                <td><div class="int-app"><div class="int-app-icon" style="background:#eef2ff;">🚀</div><span class="int-app-name">SpaceX API</span></div></td>
+                <td><span class="int-type">Launch</span></td>
+                <td><div class="progress-bar"><div class="progress-fill fill-accent" style="width:80%"></div></div></td>
+                <td><span class="int-profit" style="color:var(--green);">Active</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+</div>
 
 <script>
-// ── STARFIELD ──────────────────────────────────────────────
-(function() {
-  const sf = document.getElementById('starfield');
-  for (let i = 0; i < 120; i++) {
-    const s = document.createElement('div');
-    s.className = 'star';
-    const sz = Math.random() * 2 + 0.5;
-    s.style.cssText = `
-      width:${sz}px; height:${sz}px;
-      top:${Math.random()*100}%; left:${Math.random()*100}%;
-      --dur:${(Math.random()*5+3).toFixed(1)}s;
-      --delay:${(Math.random()*5).toFixed(1)}s;
-      --min-op:${(Math.random()*0.2+0.05).toFixed(2)};
-      --max-op:${(Math.random()*0.5+0.4).toFixed(2)};
-    `;
-    sf.appendChild(s);
-  }
-})();
-
-// ── DATE/TIME ──────────────────────────────────────────────
-(function() {
+// ── DATE / TIME ──
+function updateClock() {
   const now = new Date();
-  const opts = { weekday:'long', year:'numeric', month:'long', day:'numeric' };
-  document.getElementById('hero-date').textContent = now.toLocaleDateString('en-US', opts);
-  document.getElementById('footer-ts').textContent = 'Last updated: ' + now.toLocaleString('en-US');
-})();
+  const opts = { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' };
+  document.getElementById('today-date').textContent = now.toLocaleDateString('en-US', opts);
+  document.getElementById('today-time').textContent = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+}
+updateClock();
+setInterval(updateClock, 30000);
 
-// ── WEATHER ────────────────────────────────────────────────
+// ── SMOOTH SCROLL ──
+function smoothTo(id) {
+  event.preventDefault();
+  document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ── WEATHER ──
 const WMO = {
-  0:'Clear sky', 1:'Mainly clear', 2:'Partly cloudy', 3:'Overcast',
-  45:'Foggy', 48:'Rime fog',
-  51:'Light drizzle', 53:'Drizzle', 55:'Heavy drizzle',
-  61:'Light rain', 63:'Rain', 65:'Heavy rain',
-  71:'Light snow', 73:'Snow', 75:'Heavy snow', 77:'Snow grains',
-  80:'Light showers', 81:'Showers', 82:'Violent showers',
-  85:'Snow showers', 86:'Heavy snow showers',
-  95:'Thunderstorm', 96:'Thunderstorm w/ hail', 99:'Severe thunderstorm'
+  0: ['Clear sky', '☀️'],
+  1: ['Mainly clear', '🌤'], 2: ['Partly cloudy', '⛅'], 3: ['Overcast', '☁️'],
+  45: ['Foggy', '🌫'], 48: ['Icy fog', '🌫'],
+  51: ['Light drizzle', '🌦'], 53: ['Drizzle', '🌦'], 55: ['Heavy drizzle', '🌧'],
+  61: ['Light rain', '🌧'], 63: ['Rain', '🌧'], 65: ['Heavy rain', '🌧'],
+  71: ['Light snow', '🌨'], 73: ['Snow', '❄️'], 75: ['Heavy snow', '❄️'],
+  77: ['Snow grains', '🌨'],
+  80: ['Light showers', '🌦'], 81: ['Showers', '🌧'], 82: ['Heavy showers', '🌧'],
+  85: ['Snow showers', '🌨'], 86: ['Heavy snow showers', '❄️'],
+  95: ['Thunderstorm', '⛈'], 96: ['Thunderstorm + hail', '⛈'], 99: ['Severe thunderstorm', '⛈']
 };
 
-function weatherIcon(code) {
-  if (code === 0) return '☀️';
-  if (code <= 2) return '🌤️';
-  if (code === 3) return '☁️';
-  if (code <= 48) return '🌫️';
-  if (code <= 65) return '🌧️';
-  if (code <= 77) return '❄️';
-  if (code <= 82) return '🌦️';
-  if (code <= 86) return '🌨️';
-  return '⛈️';
+function wmoLabel(code) { return WMO[code] || ['Unknown', '🌡']; }
+
+async function fetchWeather(lat, lon) {
+  const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,apparent_temperature,weathercode&temperature_unit=fahrenheit&timezone=auto`;
+  const r = await fetch(url);
+  const d = await r.json();
+  return d.current;
 }
 
-async function fetchWeather(lat, lon, tempId, condId, windId) {
+async function loadSFWeather() {
   try {
-    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weathercode,windspeed_10m&temperature_unit=fahrenheit`;
-    const res = await fetch(url);
-    const data = await res.json();
-    const c = data.current;
-    const code = c.weathercode;
-    const icon = weatherIcon(code);
-    const label = WMO[code] || 'Unknown';
-    document.getElementById(tempId).textContent = Math.round(c.temperature_2m) + '°F';
-    document.getElementById(condId).textContent = icon + ' ' + label;
-    document.getElementById(windId).textContent = '💨 ' + Math.round(c.windspeed_10m) + ' mph winds';
+    const w = await fetchWeather(37.7558, -122.5092);
+    const [desc, icon] = wmoLabel(w.weathercode);
+    document.getElementById('sf-temp').textContent = Math.round(w.temperature_2m) + '°F';
+    document.getElementById('sf-desc').textContent = desc + ' · Feels like ' + Math.round(w.apparent_temperature) + '°F';
+    const feels = Math.round(w.apparent_temperature);
+    const el = document.getElementById('sf-feels');
+    el.textContent = icon + ' ' + feels + '°';
+    el.className = 'change-badge ' + (feels >= 65 ? 'up' : 'neutral');
   } catch(e) {
-    document.getElementById(tempId).textContent = '—';
-    document.getElementById(condId).textContent = 'Could not load weather';
+    document.getElementById('sf-temp').textContent = 'N/A';
+    document.getElementById('sf-desc').textContent = 'Weather unavailable';
   }
 }
 
-fetchWeather(37.7558, -122.5095, 'sf-temp', 'sf-cond', 'sf-wind');
-fetchWeather(50.1163, -122.9574, 'wh-temp', 'wh-cond', 'wh-wind');
-fetchWeather(38.5733, -109.5498, 'mo-temp', 'mo-cond', 'mo-wind');
+async function loadTravelWeather() {
+  const locations = [
+    { name: 'Whistler, BC', lat: 50.1163, lon: -122.9574, date: 'Sep 5', travel: true },
+    { name: 'Moab, UT', lat: 38.5733, lon: -109.5498, date: 'Sep 23', travel: true }
+  ];
+  const container = document.getElementById('weather-cards');
+  container.innerHTML = '';
+
+  for (const loc of locations) {
+    const card = document.createElement('div');
+    card.className = 'weather-card' + (loc.travel ? ' travel' : '');
+    card.innerHTML = '<div class="weather-location">' + loc.name + ' · ' + loc.date + '</div><div class="weather-temp">…°</div><div class="weather-desc">Loading…</div><div class="weather-icon">🌡</div>';
+    container.appendChild(card);
+    fetchWeather(loc.lat, loc.lon).then(w => {
+      const [desc, icon] = wmoLabel(w.weathercode);
+      card.querySelector('.weather-temp').textContent = Math.round(w.temperature_2m) + '°F';
+      card.querySelector('.weather-desc').textContent = desc;
+      card.querySelector('.weather-icon').textContent = icon;
+    }).catch(() => {
+      card.querySelector('.weather-temp').textContent = 'N/A';
+      card.querySelector('.weather-desc').textContent = 'Unavailable';
+    });
+  }
+}
+
+loadSFWeather();
+loadTravelWeather();
+
+// ── EMAIL HIGHLIGHTS ──
+const emails = [
+  {
+    initials: 'ZL', color: '#6366f1',
+    sender: 'Zesty Labs Team',
+    subject: 'Q3 product roadmap review — action needed',
+    why: 'You're cc'd with a decision deadline today on the new feature prioritization.',
+    link: 'https://mail.google.com/mail/u/0/#search/zesty+labs+roadmap'
+  },
+  {
+    initials: 'SW', color: '#14b8a6',
+    sender: 'Sandalwood West / Energy GPS',
+    subject: 'Site visit follow-up + proposal PDF',
+    why: 'Proposal attached — review before Thursday call.',
+    link: 'https://mail.google.com/mail/u/0/#search/sandalwood+energy'
+  },
+  {
+    initials: 'WB', color: '#f97316',
+    sender: 'Whistler Bookings',
+    subject: 'Your Sep 5–8 reservation — confirmation #WH-8821',
+    why: 'Booking confirmed, check-in details and parking pass inside.',
+    link: 'https://mail.google.com/mail/u/0/#search/whistler+booking'
+  },
+  {
+    initials: 'SX', color: '#ef4444',
+    sender: 'SpaceX / Starship Updates',
+    subject: 'IFT-9 flight window announced',
+    why: 'Next integrated flight test window opens — relevant for your tracker.',
+    link: 'https://mail.google.com/mail/u/0/#search/spacex+starship'
+  }
+];
+
+function renderEmails() {
+  const list = document.getElementById('email-list');
+  list.innerHTML = emails.map(e => `
+    <div class="email-card">
+      <div class="email-avatar" style="background:${e.color}">${e.initials}</div>
+      <div style="flex:1;min-width:0;">
+        <div class="email-sender">${e.sender}</div>
+        <div class="email-subject">${e.subject}</div>
+        <div class="email-why">${e.why}</div>
+      </div>
+      <a href="${e.link}" target="_blank" class="email-link">Open →</a>
+    </div>
+  `).join('');
+  document.getElementById('email-count').textContent = emails.length;
+  document.getElementById('email-badge').textContent = emails.length;
+}
+renderEmails();
+
+// ── PROJECT THREADS ──
+const threads = [
+  {
+    project: 'Starship IFT-9 Tracker',
+    source: 'slack',
+    summary: 'Flight window discussion in #spacex-updates: FAA waiver expected by end of week. Trajectory sim needs updated wind data. Three team members flagged.',
+    meta: '6 messages · 2 hours ago'
+  },
+  {
+    project: 'Energy GPS / Sandalwood West',
+    source: 'imessage',
+    summary: 'Site coordinator confirmed Thursday walkthrough. Permit docs still pending from county office — follow up EOD.',
+    meta: '4 messages · Yesterday'
+  },
+  {
+    project: 'Zesty Labs — Product Sprint',
+    source: 'gmail',
+    summary: 'Q3 sprint kickoff thread. Design review scheduled for Wed 2pm PT. Loom from PM with context on prioritization framework.',
+    meta: '9 messages · 3 hours ago'
+  }
+];
+
+function sourceBadge(src) {
+  const map = { slack: 'Slack', imessage: 'iMessage', gmail: 'Gmail' };
+  return `<span class="source-badge ${src}">${map[src] || src}</span>`;
+}
+
+function renderThreads() {
+  const list = document.getElementById('thread-list');
+  list.innerHTML = threads.map(t => `
+    <div class="thread-card">
+      <div class="thread-header">
+        <span class="thread-project">${t.project}</span>
+        ${sourceBadge(t.source)}
+      </div>
+      <div class="thread-summary">${t.summary}</div>
+      <div class="thread-meta">${t.meta}</div>
+    </div>
+  `).join('');
+  document.getElementById('thread-count').textContent = threads.length;
+  document.getElementById('thread-badge').textContent = threads.length;
+}
+renderThreads();
 </script>
+
 </body>
 </html>
