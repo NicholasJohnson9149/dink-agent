@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Starship Tracker — Nico OS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #f5f6f8;
+    --card: #ffffff;
+    --border: #e8eaed;
+    --text: #1a1a2e;
+    --text-2: #5f6368;
+    --accent: #4f46e5;
+    --green: #16a34a;
+    --blue: #2563eb;
+    --orange: #ea580c;
+    --red: #dc2626;
+    --shadow: 0 1px 4px rgba(0,0,0,0.07), 0 4px 16px rgba(0,0,0,0.05);
+    --radius: 12px;
+  }
+  body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+  /* —— TOP NAV —— */
+  nav {
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    position: sticky; top: 0; z-index: 100;
+    padding: 0 24px;
+    display: flex; align-items: center; gap: 32px;
+    height: 56px;
+  }
+  .nav-brand { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 16px; color: var(--accent); text-decoration: none; }
+  .nav-brand svg { width: 22px; height: 22px; }
+  .nav-links { display: flex; gap: 4px; }
+  .nav-links a {
+    padding: 6px 14px; border-radius: 8px; text-decoration: none;
+    font-size: 14px; font-weight: 500; color: var(--text-2);
+    transition: background 0.15s, color 0.15s;
+  }
+  .nav-links a:hover { background: var(--bg); color: var(--text); }
+  .nav-links a.active { background: #ede9fe; color: var(--accent); }
+  .nav-right { margin-left: auto; font-size: 13px; color: var(--text-2); }
+
+  /* —— LAYOUT —— */
+  main { max-width: 1100px; margin: 0 auto; padding: 32px 20px; }
+  .page-header { margin-bottom: 28px; }
+  .page-header h1 { font-size: 22px; font-weight: 700; }
+  .page-header p { color: var(--text-2); font-size: 14px; margin-top: 4px; }
+
+  /* —— CARD —— */
+  .card {
+    background: var(--card); border-radius: var(--radius);
+    box-shadow: var(--shadow); padding: 32px;
+    border: 1px solid var(--border);
+    text-align: center;
+  }
+  .rocket-icon { font-size: 64px; margin-bottom: 20px; }
+  .card h2 { font-size: 20px; font-weight: 700; margin-bottom: 12px; }
+  .card p { color: var(--text-2); font-size: 15px; line-height: 1.6; max-width: 480px; margin: 0 auto 24px; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--accent); color: #fff;
+    padding: 12px 24px; border-radius: 10px;
+    text-decoration: none; font-size: 15px; font-weight: 600;
+    transition: opacity 0.15s;
+  }
+  .btn:hover { opacity: 0.88; }
+
+  /* —— EMBED SECTION —— */
+  .embed-wrap {
+    margin-top: 28px;
+    background: var(--card); border-radius: var(--radius);
+    box-shadow: var(--shadow); border: 1px solid var(--border);
+    overflow: hidden;
+  }
+  .embed-header {
+    padding: 16px 24px;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px; font-weight: 600; color: var(--text-2);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .live-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--green);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+  .embed-wrap iframe {
+    width: 100%; height: 520px; border: none; display: block;
+  }
+
+  /* —— LINKS GRID —— */
+  .links-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px; margin-top: 28px;
+  }
+  .link-card {
+    background: var(--card); border-radius: var(--radius);
+    box-shadow: var(--shadow); padding: 20px 22px;
+    text-decoration: none; color: inherit;
+    border: 1px solid var(--border); transition: box-shadow 0.15s;
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .link-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.1), 0 8px 24px rgba(0,0,0,0.08); }
+  .link-card .label { font-size: 12px; font-weight: 600; color: var(--text-2); text-transform: uppercase; letter-spacing: .04em; }
+  .link-card .title { font-size: 15px; font-weight: 600; }
+  .link-card .sub { font-size: 13px; color: var(--text-2); }
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-brand" href="daily.html">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+      <rect x="3" y="3" width="7" height="7" rx="1.5"/>
+      <rect x="14" y="3" width="7" height="7" rx="1.5"/>
+      <rect x="3" y="14" width="7" height="7" rx="1.5"/>
+      <rect x="14" y="14" width="7" height="7" rx="1.5"/>
+    </svg>
+    Nico&thinsp;OS
+  </a>
+  <div class="nav-links">
+    <a href="daily.html">Dashboard</a>
+    <a href="starship.html" class="active">Starship Tracker</a>
+  </div>
+  <div class="nav-right" id="nav-time"></div>
+</nav>
+
+<main>
+  <div class="page-header">
+    <h1>🚀 Starship Tracker</h1>
+    <p>Live SpaceX Starship launch status, schedule &amp; mission updates.</p>
+  </div>
+
+  <div class="card">
+    <div class="rocket-icon">🚀</div>
+    <h2>SpaceX Starship</h2>
+    <p>The world's most powerful rocket. Follow live launch webcasts, upcoming test flights, and mission milestones directly from SpaceX.</p>
+    <a class="btn" href="https://www.spacex.com/vehicles/starship/" target="_blank" rel="noopener">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+      View on SpaceX.com
+    </a>
+  </div>
+
+  <div class="embed-wrap">
+    <div class="embed-header">
+      <span class="live-dot"></span>
+      SpaceX YouTube — Latest Starship Broadcasts
+    </div>
+    <iframe
+      src="https://www.youtube.com/embed?listType=search&list=SpaceX+Starship+launch"
+      title="SpaceX Starship Broadcasts"
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+      allowfullscreen>
+    </iframe>
+  </div>
+
+  <div class="links-grid">
+    <a class="link-card" href="https://www.spacex.com/vehicles/starship/" target="_blank" rel="noopener">
+      <span class="label">🛸 Official</span>
+      <span class="title">SpaceX Starship</span>
+      <span class="sub">Vehicle overview &amp; specs</span>
+    </a>
+    <a class="link-card" href="https://www.youtube.com/@SpaceX" target="_blank" rel="noopener">
+      <span class="label">▶️ YouTube</span>
+      <span class="title">SpaceX Channel</span>
+      <span class="sub">Live webcasts &amp; highlights</span>
+    </a>
+    <a class="link-card" href="https://x.com/SpaceX" target="_blank" rel="noopener">
+      <span class="label">🐦 X / Twitter</span>
+      <span class="title">@SpaceX</span>
+      <span class="sub">Real-time updates</span>
+    </a>
+    <a class="link-card" href="https://nextspaceflight.com/launches" target="_blank" rel="noopener">
+      <span class="label">📅 Schedule</span>
+      <span class="title">Next Spaceflight</span>
+      <span class="sub">Upcoming launch dates</span>
+    </a>
+  </div>
+</main>
+
+<script>
+  function tick() {
+    const el = document.getElementById('nav-time');
+    if (el) el.textContent = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+  }
+  tick(); setInterval(tick, 1000);
+</script>
+</body>
+</html>
